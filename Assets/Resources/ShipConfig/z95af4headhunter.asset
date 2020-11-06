@@ -1,0 +1,174 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
+  m_Name: z95af4headhunter
+  m_EditorClassIdentifier: 
+  size: 1
+  hull: 2
+  shield: 2
+  arcDirections: 1
+  dial:
+  - {fileID: 21300000, guid: 7b7e21d3dfe0a422aa9f22bd561ec320, type: 3}
+  - {fileID: 21300000, guid: a22944c210f844f2f8241e3cad974a83, type: 3}
+  moves:
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: white
+  - speed: 1
+    maneuver: 2
+    direction: 1
+    difficulty: 
+  - speed: 1
+    maneuver: 1
+    direction: 0
+    difficulty: blue
+  - speed: 1
+    maneuver: 2
+    direction: -1
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 2
+    maneuver: 3
+    direction: 1
+    difficulty: 
+  - speed: 2
+    maneuver: 2
+    direction: 1
+    difficulty: blue
+  - speed: 2
+    maneuver: 1
+    direction: 0
+    difficulty: blue
+  - speed: 2
+    maneuver: 2
+    direction: -1
+    difficulty: blue
+  - speed: 2
+    maneuver: 3
+    direction: -1
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 3
+    maneuver: 3
+    direction: 1
+    difficulty: 
+  - speed: 3
+    maneuver: 2
+    direction: 1
+    difficulty: 
+  - speed: 3
+    maneuver: 1
+    direction: 0
+    difficulty: blue
+  - speed: 3
+    maneuver: 2
+    direction: -1
+    difficulty: 
+  - speed: 3
+    maneuver: 3
+    direction: -1
+    difficulty: 
+  - speed: 3
+    maneuver: 4
+    direction: 1
+    difficulty: red
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 4
+    maneuver: 1
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 4
+    maneuver: 4
+    direction: 1
+    difficulty: red
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  _colorSchemes:
+  - {fileID: 21300000, guid: ade31bb22fa89420c93e7f269f9ee7c9, type: 3}
+  - {fileID: 21300000, guid: 4204220fc0eec48c5bb350b224d61aa9, type: 3}
+  - {fileID: 21300000, guid: ad59910f88f6f4cfb9eac01b508d23d8, type: 3}
+  - {fileID: 21300000, guid: 3e2df14462f3647a8b082ee741ae6b83, type: 3}
+  - {fileID: 21300000, guid: c908deb83a0004b7aad28fec466a3c53, type: 3}
+  - {fileID: 21300000, guid: a053d55d18bbe4e5da942726e437c691, type: 3}
+  - {fileID: 21300000, guid: edef369e8b17043bf9ecdb6abd4cf09a, type: 3}
+  - {fileID: 21300000, guid: d6df2f8c1762c443c833d4fbcf35477a, type: 3}
+  - {fileID: 21300000, guid: 7eb4e5ff09aab4423930f73e591294c5, type: 3}
+  - {fileID: 21300000, guid: c3a1eec44cde847e587349c01b2f1586, type: 3}
+  ability: 

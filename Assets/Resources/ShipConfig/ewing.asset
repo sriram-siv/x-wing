@@ -1,0 +1,167 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
+  m_Name: ewing
+  m_EditorClassIdentifier: 
+  size: 1
+  hull: 3
+  shield: 3
+  arcDirections: 1
+  dial:
+  - {fileID: 21300000, guid: 59a1d7fdcd7ff443cb755a1cc8c3985d, type: 3}
+  - {fileID: 21300000, guid: c12561a3ce21044c4af48ef1fbab09ff, type: 3}
+  moves:
+  - speed: 1
+    maneuver: 3
+    direction: 1
+    difficulty: red
+  - speed: 1
+    maneuver: 2
+    direction: 1
+    difficulty: blue
+  - speed: 1
+    maneuver: 1
+    direction: 0
+    difficulty: blue
+  - speed: 1
+    maneuver: 2
+    direction: -1
+    difficulty: blue
+  - speed: 1
+    maneuver: 3
+    direction: -1
+    difficulty: red
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 2
+    maneuver: 3
+    direction: 1
+    difficulty: 
+  - speed: 2
+    maneuver: 2
+    direction: 1
+    difficulty: 
+  - speed: 2
+    maneuver: 1
+    direction: 0
+    difficulty: blue
+  - speed: 2
+    maneuver: 2
+    direction: -1
+    difficulty: 
+  - speed: 2
+    maneuver: 3
+    direction: -1
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 3
+    maneuver: 3
+    direction: 1
+    difficulty: 
+  - speed: 3
+    maneuver: 2
+    direction: 1
+    difficulty: 
+  - speed: 3
+    maneuver: 1
+    direction: 0
+    difficulty: blue
+  - speed: 3
+    maneuver: 2
+    direction: -1
+    difficulty: 
+  - speed: 3
+    maneuver: 3
+    direction: -1
+    difficulty: 
+  - speed: 3
+    maneuver: 5
+    direction: 1
+    difficulty: red
+  - speed: 3
+    maneuver: 5
+    direction: -1
+    difficulty: red
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 4
+    maneuver: 1
+    direction: 0
+    difficulty: blue
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 4
+    maneuver: 4
+    direction: 0
+    difficulty: red
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 5
+    maneuver: 1
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  _colorSchemes:
+  - {fileID: 21300000, guid: 2a47fe8dc107c4af1854cb3aaf920cef, type: 3}
+  - {fileID: 21300000, guid: 687dfa5952e254742b3cea11a9e466cc, type: 3}
+  ability: 'Experimental Scanners: You can acquire locks beyond range 3. You cannot
+    acquire locks at range 1.'

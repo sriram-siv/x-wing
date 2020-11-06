@@ -1,0 +1,166 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
+  m_Name: tieddefender
+  m_EditorClassIdentifier: 
+  size: 1
+  hull: 3
+  shield: 4
+  arcDirections: 1
+  dial:
+  - {fileID: 21300000, guid: 0010c0001a9944365a9c09863990e8d4, type: 3}
+  - {fileID: 21300000, guid: f843ecc06340f4bb693e1961d30b83ad, type: 3}
+  moves:
+  - speed: 1
+    maneuver: 3
+    direction: 1
+    difficulty: red
+  - speed: 1
+    maneuver: 2
+    direction: 1
+    difficulty: blue
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 1
+    maneuver: 2
+    direction: -1
+    difficulty: blue
+  - speed: 1
+    maneuver: 3
+    direction: -1
+    difficulty: red
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 2
+    maneuver: 3
+    direction: 1
+    difficulty: red
+  - speed: 2
+    maneuver: 2
+    direction: 1
+    difficulty: 
+  - speed: 2
+    maneuver: 1
+    direction: 0
+    difficulty: blue
+  - speed: 2
+    maneuver: 2
+    direction: -1
+    difficulty: 
+  - speed: 2
+    maneuver: 3
+    direction: -1
+    difficulty: red
+  - speed: 2
+    maneuver: 4
+    direction: 1
+    difficulty: red
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 3
+    maneuver: 3
+    direction: 1
+    difficulty: 
+  - speed: 3
+    maneuver: 2
+    direction: 1
+    difficulty: 
+  - speed: 3
+    maneuver: 1
+    direction: 0
+    difficulty: blue
+  - speed: 3
+    maneuver: 2
+    direction: -1
+    difficulty: 
+  - speed: 3
+    maneuver: 3
+    direction: -1
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 4
+    maneuver: 1
+    direction: 0
+    difficulty: blue
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 4
+    maneuver: 4
+    direction: 1
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 5
+    maneuver: 1
+    direction: 0
+    difficulty: blue
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  _colorSchemes:
+  - {fileID: 21300000, guid: 66e5f8a6d45b34d198a7d159f27bc480, type: 3}
+  ability: 'Full Throttle: After you fully execute a speed 3-5 maneuver, you may
+    perform an [evade] action.'

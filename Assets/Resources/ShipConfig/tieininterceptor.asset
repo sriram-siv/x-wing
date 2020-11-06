@@ -1,0 +1,167 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
+  m_Name: tieininterceptor
+  m_EditorClassIdentifier: 
+  size: 1
+  hull: 3
+  shield: 0
+  arcDirections: 1
+  dial:
+  - {fileID: 21300000, guid: 524b14f3792d24115892ab7c1bd554a0, type: 3}
+  - {fileID: 21300000, guid: d5ebe3d3ba98b4c6da46b506b0b951a8, type: 3}
+  moves:
+  - speed: 1
+    maneuver: 3
+    direction: 1
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 1
+    maneuver: 3
+    direction: -1
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 2
+    maneuver: 3
+    direction: 1
+    difficulty: blue
+  - speed: 2
+    maneuver: 2
+    direction: 1
+    difficulty: blue
+  - speed: 2
+    maneuver: 1
+    direction: 0
+    difficulty: blue
+  - speed: 2
+    maneuver: 2
+    direction: -1
+    difficulty: blue
+  - speed: 2
+    maneuver: 3
+    direction: -1
+    difficulty: blue
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 3
+    maneuver: 3
+    direction: 1
+    difficulty: 
+  - speed: 3
+    maneuver: 2
+    direction: 1
+    difficulty: 
+  - speed: 3
+    maneuver: 1
+    direction: 0
+    difficulty: blue
+  - speed: 3
+    maneuver: 2
+    direction: -1
+    difficulty: 
+  - speed: 3
+    maneuver: 3
+    direction: -1
+    difficulty: 
+  - speed: 3
+    maneuver: 5
+    direction: 1
+    difficulty: red
+  - speed: 3
+    maneuver: 5
+    direction: -1
+    difficulty: red
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 4
+    maneuver: 1
+    direction: 0
+    difficulty: blue
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 4
+    maneuver: 4
+    direction: 1
+    difficulty: red
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 5
+    maneuver: 1
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  - speed: 0
+    maneuver: 0
+    direction: 0
+    difficulty: 
+  _colorSchemes:
+  - {fileID: 21300000, guid: 3e2c04224f8e74e7cb032e9b38bcd909, type: 3}
+  - {fileID: 21300000, guid: 5c1dd6c7be51a43179ab69e8d353900d, type: 3}
+  ability: 'Autothrusters: After you perform an action, you may perform a red [barrel
+    roll] or red [boost] action.'
