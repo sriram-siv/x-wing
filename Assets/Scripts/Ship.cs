@@ -36,9 +36,6 @@ public class Ship : MonoBehaviour
     [SerializeField] GameObject basicTokens;
     [SerializeField] GameObject moveIndicator;
 
-    //[SerializeField] GameObject bomb;
-    //[SerializeField] GameObject templates;
-
     [SerializeField] GameObject deathVFX;
 
     const string SHIPS = "Ships";
@@ -120,23 +117,22 @@ public class Ship : MonoBehaviour
             AdjustStats();
         }
 
-        if (relay == null)
+        if (!relay)
         {
             Debug.Log("searching for relay");
             relay = FindObjectOfType<RelayDevice>().gameObject.GetPhotonView();
         }
-
-        //ResetZ();
     }
 
     // MOVEMENT
 
     private void ExecuteMovement()
     {
+        // Movement Controls
         if (!arcActive && !manualMode)
         {
             string message = FindObjectOfType<Loader>().GetPlayerName() + " performed a manual move (" + name + ")";
-
+            
             float angle = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)
                 ? 90f
                 : 45f;
@@ -171,7 +167,7 @@ public class Ship : MonoBehaviour
     private void KTurn()
     {
         int angle = 180;
-
+        // Turn the ship 90deg if the dhisft key is pressed
         if (Input.GetKey(KeyCode.LeftShift))
         {
             angle = 90;
@@ -185,27 +181,16 @@ public class Ship : MonoBehaviour
         transform.Rotate(0, 0, angle);
     }
 
+    /// <param name="direction">0: Forward, 1: left, 2: right</param>
     public void Boost(int direction)
     {
-        switch (direction)
-        {
-            case 0:
-                StartCoroutine(Forward(1));
-                break;
-            case 1:
-                StartCoroutine(Turn(45f, 0, 1));
-                break;
-            case 2:
-                StartCoroutine(Turn(45f, 0, -1));
-                break;
-            default:
-                break;
-        }
-    }
+        if (direction == 0) StartCoroutine(Forward(1));
+        if (direction == 1) StartCoroutine(Turn(45f, 0, 1));
+        if (direction == 2) StartCoroutine(Turn(45f, 0, -1));
+  }
 
     public void BarrelRoll(int direction, int position)
     {
-        //int[] vals = shipMenu.GetBarrel(); // direction, end pos
         controller.LogMove(uniqueID, transform.position, 0, 0);
 
         float lateralMovement = direction == 0
@@ -214,7 +199,7 @@ public class Ship : MonoBehaviour
         Vector3 vector = new Vector3(lateralMovement, 0);
         transform.Translate(vector);
 
-        // End pos adjustment
+        // End position adjustment
         float adjust = position == 0
             ? 0
             : position == 1
@@ -247,7 +232,6 @@ public class Ship : MonoBehaviour
 
     public void Decloak(int[] vals)
     {
-        //int[] vals = shipMenu.GetDecloak(); // template, direction, end pos
         if (shipSize != 1) { vals[0] = 0; } // ensure bank template isn't used for any calculations
         
         float angle = vals[0] == 0
@@ -329,7 +313,7 @@ public class Ship : MonoBehaviour
     {
         cloaked = state;
 
-     shipBody.GetComponent<SpriteRenderer>().color = cloaked
+        shipBody.GetComponent<SpriteRenderer>().color = cloaked
             ? new Color32(70, 50, 255, 150)
             : new Color32(255, 255, 255, 255);
     }
@@ -472,7 +456,6 @@ public class Ship : MonoBehaviour
     }
 
     // CONFIG
-
 
     public void SetVelocity(int newVelocity)
     {
@@ -803,8 +786,8 @@ public class Ship : MonoBehaviour
     {
         if (manualMode && !menu.CheckOpenHand() && !menu.CheckMenuOpen())
         {
-            Vector3 trans = Camera.main.ScreenToWorldPoint(new Vector3(
-                    Input.mousePosition.x, Input.mousePosition.y, 0));
+            Vector3 trans = Camera.main.ScreenToWorldPoint(
+                new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
             trans -= mouseToCenter;
             float xPos = Mathf.Round(trans.x * 10) / 10;
             float yPos = Mathf.Round(trans.y * 10) / 10;
@@ -823,11 +806,6 @@ public class Ship : MonoBehaviour
     {
         nameLabel.SetActive(true);
         mouseOver = true;
-        if (Input.GetMouseButtonDown(1) && !menu.CheckOpenHand() && !menu.CheckMenuOpen())
-        {
-            //shipMenu.SetShip(this);
-            //SelectShip();
-        }
     }
 
     public bool CheckForMouseOver()
