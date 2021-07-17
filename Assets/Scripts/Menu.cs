@@ -645,8 +645,12 @@ public class Menu : MonoBehaviour
         }
         else
         {
+            Loader loader = FindObjectOfType<Loader>();
+            float xChange = Input.mouseScrollDelta.x;
+            if (loader.isWebGL) xChange *= -1;
+
             scrollX = Mathf.Clamp(Camera.main.transform.position.x -
-                (Input.mouseScrollDelta.x / scrollSpeed), minX, maxX);
+                (xChange / scrollSpeed), minX, maxX);
             scrollY = Mathf.Clamp(Camera.main.transform.position.y +
                 Input.GetAxis("Mouse ScrollWheel") * scrollSpeed, minY, maxY);
         }

@@ -23,6 +23,9 @@ public class Loader : MonoBehaviour
     int playmat = 0;
     string playerName;
 
+    bool _isWebGL = false;
+    public bool isWebGL { get { return _isWebGL; }}
+
     void Start()
     {
         DontDestroyOnLoad(gameObject);
@@ -452,5 +455,15 @@ public class Loader : MonoBehaviour
     {
         public int cardIndex;
         public bool flipped;
+    }
+
+    public void pasteFromBrowser(string text)
+    {
+        inputField.text = text;
+    }
+
+    public void clientIsWebGL()
+    {
+        _isWebGL = true;
     }
 }
