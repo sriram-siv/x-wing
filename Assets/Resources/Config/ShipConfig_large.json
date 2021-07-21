@@ -1,0 +1,26 @@
+{
+  "width": 8,
+  "movement": {
+    "forward": [12, 16, 20, 24, 28],
+    "bank": [18.1, 22.95, 27.9],
+    "turn": [8.5, 11.3, 13.95]
+  },
+  "barrel": [10, 2],
+  "cloak": [
+    [10, 0],
+    [10, 0],
+    [10, 0]
+  ],
+  "objects": {
+    "arc": [0, 4],
+    "template": [0, -4],
+    "stats": [0, 2],
+    "coords": [0, -1.7],
+    "status": [-5.5, 2],
+    "basic": [0, -2.2],
+    "stress": [-5.5, 4],
+    "reinforceFore": [5.5, 1.5],
+    "reinforceAft": [5.5, -1.5],
+    "target": [0, 6]
+  }
+}

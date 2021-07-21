@@ -1,0 +1,80 @@
+{
+  "small": {
+    "width": 4,
+    "movement": {
+      "forward": [8, 12, 16, 20, 24],
+      "bank": [13.05, 17.85, 22.8],
+      "turn": [5.95, 8.7, 11.4]
+    },
+    "barrel": [8, 1],
+    "cloak": {
+      "straight": [-12, 0],
+      "left": [-12.45, -5.15],
+      "right": [-12.45, 5.15]
+    },
+    "objects": {
+      "_arc": [0, 2],
+      "_template": [0, -2],
+      "_stats": [0, 0],
+      "_coords": [0, 0],
+      "_status": [-3, 1.4],
+      "_basic": [0, 0],
+      "_stress": [-3.5, 2.4],
+      "_reinforceFore": [3, 1],
+      "_reinforceAft": [3, -1],
+      "_target": [0, 3.9]
+    }
+  },
+  "medium": {
+    "width": 6,
+    "movement": {
+      "forward": [10, 14, 18, 22, 26],
+      "bank": [15.55, 20.4, 25.35],
+      "turn": [7.2, 10, 12.65]
+    },
+    "barrel": [8, 2],
+    "cloak": {
+      "straight": [-8, 0],
+      "left": [-8, 0],
+      "right": [-8, 0]
+    },
+    "objects": {
+      "_arc": [0, 3],
+      "_template": [0, -3],
+      "_stats": [0, 1.1],
+      "_coords": [0, -1.7],
+      "_status": [-4.5, 2],
+      "_basic": [0, -1.1],
+      "_stress": [-4.5, 3.7],
+      "_reinforceFore": [4.5, 1.5],
+      "_reinforceAft": [4.5, -1.5],
+      "_target": [0, 5]
+    }
+  },
+  "large": {
+    "width": 8,
+    "movement": {
+      "forward": [12, 16, 20, 24, 28],
+      "bank": [18.1, 22.95, 27.9],
+      "turn": [8.5, 11.3, 13.95]
+    },
+    "barrel": [10, 2],
+    "cloak": {
+      "straight": [-10, 0],
+      "left": [-10, 0],
+      "right": [-10, 0]
+    },
+    "objects": {
+      "_arc": [0, 4],
+      "_template": [0, -4],
+      "_stats": [0, 2],
+      "_coords": [0, -1.7],
+      "_status": [-5.5, 2],
+      "_basic": [0, -2.2],
+      "_stress": [-5.5, 4],
+      "_reinforceFore": [5.5, 1.5],
+      "_reinforceAft": [5.5, -1.5],
+      "_target": [0, 6]
+    }
+  }
+}
