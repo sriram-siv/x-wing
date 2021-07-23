@@ -332,8 +332,8 @@ public class Menu : MonoBehaviour
       ship.ToggleMoveIndicator(false);
     }
 
-    FindObjectOfType<ActionBar>().ToggleActionBar(0);
-    FindObjectOfType<ActionBar>().AttachShip(null);
+    FindObjectOfType<ActionBar>().ToggleBar("hidden");
+    FindObjectOfType<ActionBar>().attachedShip = null;
 
   }
 

@@ -233,7 +233,7 @@ public class GameController : MonoBehaviour
   {
     if (!Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift) && Input.GetMouseButtonDown(0))
     {
-      if (!actionBar.barMouseOver)
+      if (!actionBar.isMouseOver)
       {
         Ship[] ships = FindObjectsOfType<Ship>();
         bool mouseOverShip = false;
@@ -260,8 +260,8 @@ public class GameController : MonoBehaviour
 
         if (!mouseOverShip && !dropdownActive)
         {
-          actionBar.ToggleActionBar(0);
-          actionBar.AttachShip(null);
+          actionBar.ToggleBar("hidden");
+          actionBar.attachedShip = null;
 
         }
 

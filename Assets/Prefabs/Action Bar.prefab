@@ -1534,7 +1534,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 910806179}
         m_TargetAssemblyTypeName: ActionBar, Assembly-CSharp
-        m_MethodName: OpenTab
+        m_MethodName: ToggleBar
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1899,7 +1899,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 910806179}
         m_TargetAssemblyTypeName: ActionBar, Assembly-CSharp
-        m_MethodName: OpenTab
+        m_MethodName: ToggleBar
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2778,7 +2778,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 910806179}
         m_TargetAssemblyTypeName: ActionBar, Assembly-CSharp
-        m_MethodName: OpenTab
+        m_MethodName: ToggleBar
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2911,7 +2911,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 910806179}
         m_TargetAssemblyTypeName: ActionBar, Assembly-CSharp
-        m_MethodName: OpenTab
+        m_MethodName: ToggleBar
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4877,7 +4877,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 910806179}
         m_TargetAssemblyTypeName: ActionBar, Assembly-CSharp
-        m_MethodName: OpenTab
+        m_MethodName: ToggleBar
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6563,7 +6563,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 910806179}
         m_TargetAssemblyTypeName: ActionBar, Assembly-CSharp
-        m_MethodName: OpenTab
+        m_MethodName: ToggleBar
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6943,26 +6943,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14bfcc62da37a4889b4978f1337f5ddb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pilotName: {fileID: 8993974404048330726}
-  mainTab: {fileID: 9162555069487349214}
-  barrelTab: {fileID: 6356267493883851174}
+  barLabel: {fileID: 8993974404048330726}
   barrelDirection: {fileID: 8867979619046093906}
   barrelPosition: {fileID: 1531536538396525669}
-  boostTab: {fileID: 4050182099755995740}
   boostDirection: {fileID: 7558861746553217680}
-  cloakTab: {fileID: 615909807830601922}
   cloakDirection: {fileID: 5489257399249045872}
   cloakPosition: {fileID: 1547136289257832509}
   cloakTemplate: {fileID: 6915630002692524582}
-  deviceTab: {fileID: 8827859731764943300}
   deviceType: {fileID: 8705069840223745820}
   deviceSpeed: {fileID: 5791526736198487501}
   deviceDirection: {fileID: 1480549689947698170}
-  statsTab: {fileID: 7368376481135128377}
   hullLabel: {fileID: 6588680598022458101}
   shieldLabel: {fileID: 2329407325379169825}
   forceLabel: {fileID: 7881120283773102442}
   chargeLabel: {fileID: 3506994216483065833}
+  tabs:
+  - name: main
+    tab: {fileID: 9162555069487349214}
+  - name: barrel
+    tab: {fileID: 6356267493883851174}
+  - name: boost
+    tab: {fileID: 4050182099755995740}
+  - name: cloak
+    tab: {fileID: 615909807830601922}
+  - name: device
+    tab: {fileID: 8827859731764943300}
+  - name: stats
+    tab: {fileID: 7368376481135128377}
 --- !u!61 &5603036989296887969
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -13026,7 +13033,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 910806179}
         m_TargetAssemblyTypeName: ActionBar, Assembly-CSharp
-        m_MethodName: OpenTab
+        m_MethodName: ToggleBar
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

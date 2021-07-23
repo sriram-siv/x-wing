@@ -1,54 +1,42 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 
 public class ActionBar : MonoBehaviour
 {
-  bool _barActive = false;
-  public bool barActive { get { return _barActive; } }
-  bool _barMouseOver = false;
-  public bool barMouseOver { get { return _barMouseOver; } }
-
-  Ship attachedShip;
-  [SerializeField] Text pilotName;
-  [SerializeField] GameObject mainTab;
+  [SerializeField] Text barLabel;
 
   [Header("Barrel Roll")]
-  [SerializeField] GameObject barrelTab;
   [SerializeField] Dropdown barrelDirection;
   [SerializeField] Dropdown barrelPosition;
 
   [Header("Boost")]
-  [SerializeField] GameObject boostTab;
   [SerializeField] Dropdown boostDirection;
 
   [Header("Cloak")]
-  [SerializeField] GameObject cloakTab;
   [SerializeField] Dropdown cloakDirection;
   [SerializeField] Dropdown cloakPosition;
   [SerializeField] Dropdown cloakTemplate;
 
   [Header("Device")]
-  [SerializeField] GameObject deviceTab;
   [SerializeField] Dropdown deviceType;
   [SerializeField] Dropdown deviceSpeed;
   [SerializeField] Dropdown deviceDirection;
 
   [Header("Stats")]
-  [SerializeField] GameObject statsTab;
   [SerializeField] Text hullLabel;
   [SerializeField] Text shieldLabel;
   [SerializeField] Text forceLabel;
   [SerializeField] Text chargeLabel;
 
-  void Start()
-  {
+  [SerializeField]
+  ActionBarTab[] tabs;
 
-  }
+  public Ship attachedShip;
+  Vector2 barPosition { set { GetComponent<RectTransform>().anchoredPosition = value; } }
+  bool _isMouseOver = false;
+  public bool isMouseOver { get { return _isMouseOver; } }
 
-  // Update is called once per frame
   void Update()
   {
     if (attachedShip != null)
@@ -62,53 +50,48 @@ public class ActionBar : MonoBehaviour
     bool actions = Input.GetKeyDown(KeyCode.A);
     bool stats = Input.GetKeyDown(KeyCode.S);
 
-
-    if (actions)
-    {
-      if (mainTab.activeSelf)
-      {
-        ToggleActionBar(1);
-        OpenTab();
-      }
-      else
-      {
-        ToggleActionBar(2);
-        OpenTab("main");
-      }
-    }
-    if (stats)
-    {
-      if (statsTab.activeSelf)
-      {
-        ToggleActionBar(1);
-        OpenTab();
-      }
-      else
-      {
-        ToggleActionBar(2);
-        OpenTab("stats");
-      }
-    }
+    if (actions) ToggleBar("main");
+    if (stats) ToggleBar("stats");
   }
 
-  // States: 0 hidden, 1 showing only title (controls), 2 showing full bar
-  public void ToggleActionBar(int state)
+  public void ToggleBar(string openTab)
   {
-    _barActive = state == 2
-        ? true
-        : false;
+    Vector2 hidden = new Vector2(0, -200);
+    Vector2 collapsed = new Vector2(0, -80);
+    Vector2 expanded = new Vector2(0, 10);
 
-    GetComponent<RectTransform>().anchoredPosition = _barActive
-        ? new Vector2(0, 10)
-        : state == 1
-            ? new Vector2(0, -80)
-            : new Vector2(0, -200);
+    barLabel.text = "A : Actions    S : Stats    Enter : Execute Move From Dial";
 
-    pilotName.text = state == 2
-        ? attachedShip.name
-        : "A : Actions    S : Stats    Enter : Execute Move From Dial";
+    foreach (ActionBarTab tab in tabs)
+    {
+      if (tab.name == openTab)
+      {
+        bool prevState = tab.tab.activeSelf;
+        tab.tab.SetActive(!prevState);
+        barPosition = prevState ? collapsed : expanded;
+        if (!prevState) barLabel.text = attachedShip.name;
+      }
+      else { tab.tab.SetActive(false); }
+    }
 
-    if (state == 1) { OpenTab(); }
+    if (openTab == "hidden") barPosition = hidden;
+    if (openTab == "collapsed") barPosition = collapsed;
+    if (openTab == "stats") UpdateStats();
+
+    ResetDropdownValues();
+  }
+
+  private void ResetDropdownValues()
+  {
+    barrelDirection.value = 0;
+    barrelPosition.value = 0;
+    boostDirection.value = 0;
+    cloakTemplate.value = 0;
+    cloakDirection.value = 0;
+    cloakPosition.value = 0;
+    deviceType.value = 0;
+    deviceSpeed.value = 0;
+    deviceDirection.value = 0;
   }
 
   public void AttachShip(Ship ship)
@@ -118,15 +101,14 @@ public class ActionBar : MonoBehaviour
 
   public void PerformAction(string action)
   {
-    int increment = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)
-        ? -1
-        : 1;
+    bool shiftActive = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+    int change = shiftActive ? -1 : 1;
 
     attachedShip.gameObject.GetPhotonView().RPC(
         "AdjustTokens",
         RpcTarget.AllBuffered,
         action,
-        increment
+        change
     );
   }
 
@@ -137,14 +119,8 @@ public class ActionBar : MonoBehaviour
 
   public void Cloak()
   {
-    if (!attachedShip.isCloaked)
-    {
-      attachedShip.Cloak();
-    }
-    else
-    {
-      OpenTab("cloak");
-    }
+    if (!attachedShip.isCloaked) attachedShip.Cloak();
+    else ToggleBar("cloak");
   }
 
   public void Decloak()
@@ -158,7 +134,7 @@ public class ActionBar : MonoBehaviour
     string direction = barrelDirection.options[barrelDirection.value].text;
     string position = barrelPosition.options[barrelPosition.value].text;
     attachedShip.BarrelRoll(direction, position);
-    OpenTab("main");
+    ToggleBar("main");
   }
 
   public void Boost()
@@ -170,12 +146,6 @@ public class ActionBar : MonoBehaviour
   {
     int[] vals = { deviceSpeed.value, deviceDirection.value, deviceType.value };
     attachedShip.DropBomb(vals);
-  }
-
-  private class AdjustStatsProps
-  {
-    public string stat;
-    public int change;
   }
 
   // TODO Remove wraparound on count
@@ -214,44 +184,7 @@ public class ActionBar : MonoBehaviour
     label.text = count.ToString();
   }
 
-  private struct Tab
-  {
-    public string name;
-    public GameObject tab;
-  }
-
-  public void OpenTab(string openTab = "")
-  {
-    Tab[] tabs = new Tab[]{
-      new Tab(){ name = "main", tab = mainTab },
-      new Tab(){ name = "barrel", tab = barrelTab },
-      new Tab(){ name = "boost", tab = boostTab },
-      new Tab(){ name = "cloak", tab = cloakTab },
-      new Tab(){ name = "device", tab = deviceTab },
-      new Tab(){ name = "stats", tab = statsTab },
-    };
-
-    foreach (Tab tab in tabs)
-    {
-      tab.tab.SetActive(tab.name == openTab);
-    }
-
-    barrelDirection.value = 0;
-    barrelPosition.value = 0;
-    boostDirection.value = 0;
-    cloakTemplate.value = 0;
-    cloakDirection.value = 0;
-    cloakPosition.value = 0;
-    deviceType.value = 0;
-    deviceSpeed.value = 0;
-    deviceDirection.value = 0;
-
-    if (openTab == "stats")
-    {
-      UpdateStats();
-    }
-  }
-
+  // TODO this could listen to Stats.update or something similar
   public void UpdateStats()
   {
     Stats stats = attachedShip.GetComponent<Stats>();
@@ -264,11 +197,24 @@ public class ActionBar : MonoBehaviour
 
   private void OnMouseOver()
   {
-    _barMouseOver = true;
+    _isMouseOver = true;
   }
 
   private void OnMouseExit()
   {
-    _barMouseOver = false;
+    _isMouseOver = false;
+  }
+
+  [System.Serializable]
+  public struct ActionBarTab
+  {
+    public string name;
+    public GameObject tab;
+  }
+
+  private class AdjustStatsProps
+  {
+    public string stat;
+    public int change;
   }
 }

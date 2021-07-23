@@ -217,7 +217,7 @@ public class Ship : MonoBehaviour
     if (isCloaked)
     {
       ActionBar bar = FindObjectOfType<ActionBar>();
-      bar.OpenTab("cloak");
+      bar.ToggleBar("cloak");
     }
     else
     {
@@ -739,8 +739,8 @@ public class Ship : MonoBehaviour
       selectMarker.SetActive(true);
 
       ActionBar bar = FindObjectOfType<ActionBar>();
-      bar.AttachShip(this);
-      bar.ToggleActionBar(1);
+      bar.attachedShip = this;
+      bar.ToggleBar("collapsed");
 
       Hazards[] hazards = FindObjectsOfType<Hazards>();
       foreach (Hazards hazard in hazards) { hazard.Deselect(); }
@@ -1337,8 +1337,7 @@ public class Ship : MonoBehaviour
     {
       ActionBar bar = FindObjectOfType<ActionBar>();
       // TODO make this reclosable with B
-      bar.ToggleActionBar(2);
-      bar.OpenTab("barrel");
+      bar.ToggleBar("main");
     }
   }
 
