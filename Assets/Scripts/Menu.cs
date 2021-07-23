@@ -330,6 +330,7 @@ public class Menu : MonoBehaviour
     {
       ship.DeselectShip();
       ship.ToggleMoveIndicator(false);
+      ship.HighlightShip(false);
     }
 
     FindObjectOfType<ActionBar>().ToggleBar("hidden");

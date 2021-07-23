@@ -136,6 +136,7 @@ public class Dial : MonoBehaviour
     dialActive = true;
     upgrades.SetActive(true);
     damage.SetActive(true);
+    GetAttachedShip().HighlightShip(true);
 
     AnchorUpgradesDisplay();
     UpgradeCard[] upgradeCards = FindObjectsOfType<UpgradeCard>();
@@ -151,11 +152,13 @@ public class Dial : MonoBehaviour
     selected = false;
     upgrades.SetActive(false);
     damage.SetActive(false);
+    attachedShip.GetComponent<Ship>().HighlightShip(false);
   }
 
   public void SetDialActive(bool state)
   {
     dialActive = state;
+    attachedShip.GetComponent<Ship>().HighlightShip(true);
   }
 
   public void AnchorUpgradesDisplay()
@@ -183,16 +186,19 @@ public class Dial : MonoBehaviour
   private void OnMouseEnter()
   {
     _mouseOver = true;
+    attachedShip.GetComponent<Ship>().HighlightShip(true);
   }
 
   private void OnMouseExit()
   {
     _mouseOver = false;
+    if (!dialActive) attachedShip.GetComponent<Ship>().HighlightShip(false);
   }
 
   public void SetMouseOver(bool state)
   {
     _mouseOver = state;
+    attachedShip.GetComponent<Ship>().HighlightShip(state);
   }
 
   private void Destroy()

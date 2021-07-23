@@ -750,6 +750,12 @@ public class Ship : MonoBehaviour
     }
   }
 
+  public void HighlightShip(bool state)
+  {
+    nameLabel.SetActive(state);
+    selectMarker.SetActive(state);
+  }
+
   [PunRPC]
   private void DestroyShip()
   {
