@@ -167,8 +167,6 @@ public class UpgradeCard : MonoBehaviour
 
   private void AdjustCharge(int change)
   {
-    if (!attachedDial.GetComponent<Dial>().ownShip) { return; }
-
     chargeAmount = Mathf.Clamp(chargeAmount + change, 0, chargeMax);
     forceAmount = Mathf.Clamp(forceAmount + change, 0, forceMax);
 
@@ -186,7 +184,7 @@ public class UpgradeCard : MonoBehaviour
       force.GetComponentInChildren<TMP_Text>().text = forceAmount.ToString();
     }
 
-    UpdateUpgrade();
+    if (attachedDial.GetComponent<Dial>().ownShip) UpdateUpgrade();
   }
 
   // Outgoing
@@ -223,7 +221,7 @@ public class UpgradeCard : MonoBehaviour
 
   private void Controls()
   {
-    if (!selected) return;
+    if (!selected || !attachedDial.GetComponent<Dial>().ownShip) return;
 
     bool increaseCharge = Input.GetKeyDown(KeyCode.UpArrow);
     bool decreaseCharge = Input.GetKeyDown(KeyCode.DownArrow);
