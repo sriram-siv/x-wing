@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
   m_Name: scavengedyt1300
   m_EditorClassIdentifier: 
-  size: 2
-  hull: 8
-  shield: 3
-  arcDirections: 2
-  dial:
+  _sizeNum: 2
+  _size: 2
+  _hull: 8
+  _shield: 3
+  _arcs: 2
+  _dial:
   - {fileID: 21300000, guid: 57b69b749b7bf4f6f9279c591c645fff, type: 3}
   - {fileID: 21300000, guid: 66bc0a52009e64a3bbe9cce0f097d636, type: 3}
-  moves:
+  _moves:
   - speed: 0
     maneuver: 0
     direction: 0
@@ -162,4 +163,4 @@ MonoBehaviour:
     difficulty: 
   _colorSchemes:
   - {fileID: 21300000, guid: 7fcfc5d57d8bc4f2f8d1633e8d68c10a, type: 3}
-  ability: 
+  _ability: 

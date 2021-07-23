@@ -68,12 +68,12 @@ public class ActionBar : MonoBehaviour
       if (mainTab.activeSelf)
       {
         ToggleActionBar(1);
-        OpenTab(null);
+        OpenTab();
       }
       else
       {
         ToggleActionBar(2);
-        OpenTab(mainTab);
+        OpenTab("main");
       }
     }
     if (stats)
@@ -81,12 +81,12 @@ public class ActionBar : MonoBehaviour
       if (statsTab.activeSelf)
       {
         ToggleActionBar(1);
-        OpenTab(null);
+        OpenTab();
       }
       else
       {
         ToggleActionBar(2);
-        OpenTab(statsTab);
+        OpenTab("stats");
       }
     }
   }
@@ -108,7 +108,7 @@ public class ActionBar : MonoBehaviour
         ? attachedShip.name
         : "A : Actions    S : Stats    Enter : Execute Move From Dial";
 
-    if (state == 1) { OpenTab(null); }
+    if (state == 1) { OpenTab(); }
   }
 
   public void AttachShip(Ship ship)
@@ -137,13 +137,13 @@ public class ActionBar : MonoBehaviour
 
   public void Cloak()
   {
-    if (!attachedShip.GetCloakState())
+    if (!attachedShip.isCloaked)
     {
       attachedShip.Cloak();
     }
     else
     {
-      OpenTab(cloakTab);
+      OpenTab("cloak");
     }
   }
 
@@ -158,7 +158,7 @@ public class ActionBar : MonoBehaviour
     string direction = barrelDirection.options[barrelDirection.value].text;
     string position = barrelPosition.options[barrelPosition.value].text;
     attachedShip.BarrelRoll(direction, position);
-    OpenTab(mainTab);
+    OpenTab("main");
   }
 
   public void Boost()
@@ -214,14 +214,27 @@ public class ActionBar : MonoBehaviour
     label.text = count.ToString();
   }
 
-  public void OpenTab(GameObject openTab)
+  private struct Tab
   {
-    mainTab.SetActive(false);
-    barrelTab.SetActive(false);
-    boostTab.SetActive(false);
-    cloakTab.SetActive(false);
-    deviceTab.SetActive(false);
-    statsTab.SetActive(false);
+    public string name;
+    public GameObject tab;
+  }
+
+  public void OpenTab(string openTab = "")
+  {
+    Tab[] tabs = new Tab[]{
+      new Tab(){ name = "main", tab = mainTab },
+      new Tab(){ name = "barrel", tab = barrelTab },
+      new Tab(){ name = "boost", tab = boostTab },
+      new Tab(){ name = "cloak", tab = cloakTab },
+      new Tab(){ name = "device", tab = deviceTab },
+      new Tab(){ name = "stats", tab = statsTab },
+    };
+
+    foreach (Tab tab in tabs)
+    {
+      tab.tab.SetActive(tab.name == openTab);
+    }
 
     barrelDirection.value = 0;
     barrelPosition.value = 0;
@@ -233,30 +246,19 @@ public class ActionBar : MonoBehaviour
     deviceSpeed.value = 0;
     deviceDirection.value = 0;
 
-    if (openTab != null)
-    {
-      openTab.SetActive(true);
-    }
-
-    if (openTab == statsTab)
+    if (openTab == "stats")
     {
       UpdateStats();
     }
-
-  }
-
-  public void OpenBarrelTab()
-  {
-    OpenTab(barrelTab);
   }
 
   public void UpdateStats()
   {
     Stats stats = attachedShip.GetComponent<Stats>();
 
-    hullLabel.text = stats.GetHull().ToString();
-    shieldLabel.text = stats.GetShield().ToString();
-    forceLabel.text = stats.GetForce().ToString();
+    hullLabel.text = stats.hull.ToString();
+    shieldLabel.text = stats.shield.ToString();
+    forceLabel.text = stats.force.ToString();
     chargeLabel.text = stats.charge.ToString();
   }
 

@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
   m_Name: firesprayclasspatrolcraft
   m_EditorClassIdentifier: 
-  size: 1.5
-  hull: 6
-  shield: 4
-  arcDirections: 2
-  dial:
+  _sizeNum: 1.5
+  _size: 1
+  _hull: 6
+  _shield: 4
+  _arcs: 2
+  _dial:
   - {fileID: 21300000, guid: 176062bdc760d4abd829f4831ba7ac1f, type: 3}
   - {fileID: 21300000, guid: 319e45aff1a844da9b312e6b6a3b436c, type: 3}
-  moves:
+  _moves:
   - speed: 1
     maneuver: 3
     direction: 1
@@ -165,4 +166,4 @@ MonoBehaviour:
   - {fileID: 21300000, guid: ee112fe5340b24531b0ce219fc22ddeb, type: 3}
   - {fileID: 21300000, guid: eb5f51f3c39ed49f28b95f29a4c9ce20, type: 3}
   - {fileID: 21300000, guid: be08eb2733ba5408a817843515b5eb00, type: 3}
-  ability: 
+  _ability: 

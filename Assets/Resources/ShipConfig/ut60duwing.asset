@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
   m_Name: ut60duwing
   m_EditorClassIdentifier: 
-  size: 1.5
-  hull: 5
-  shield: 3
-  arcDirections: 1
-  dial:
+  _sizeNum: 1.5
+  _size: 1
+  _hull: 5
+  _shield: 3
+  _arcs: 1
+  _dial:
   - {fileID: 21300000, guid: 2c1d27abc1690456d9b0df806ec082fb, type: 3}
   - {fileID: 21300000, guid: 7c482871bc82d4f38b7570c1bf69d2bd, type: 3}
-  moves:
+  _moves:
   - speed: 0
     maneuver: 0
     direction: 0
@@ -162,4 +163,4 @@ MonoBehaviour:
     difficulty: white
   _colorSchemes:
   - {fileID: 21300000, guid: 3c8cb58ac201143d1bbea20117fc7e51, type: 3}
-  ability: 
+  _ability: 

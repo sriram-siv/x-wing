@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
   m_Name: customizedyt1300lightfreighter
   m_EditorClassIdentifier: 
-  size: 2
-  hull: 8
-  shield: 3
-  arcDirections: 2
-  dial:
+  _sizeNum: 2
+  _size: 2
+  _hull: 8
+  _shield: 3
+  _arcs: 2
+  _dial:
   - {fileID: 21300000, guid: dc1135dee9a8a4691b8e5c3067fdb396, type: 3}
   - {fileID: 21300000, guid: f1458265bf4d847c4a8f3a71cc0e5fd1, type: 3}
-  moves:
+  _moves:
   - speed: 0
     maneuver: 0
     direction: 0
@@ -162,4 +163,4 @@ MonoBehaviour:
     difficulty: 
   _colorSchemes:
   - {fileID: 21300000, guid: 760edbfb7bb8840b0b7dc62925ed0424, type: 3}
-  ability: 
+  _ability: 

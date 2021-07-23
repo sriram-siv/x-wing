@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
   m_Name: mg100starfortress
   m_EditorClassIdentifier: 
-  size: 2
-  hull: 9
-  shield: 3
-  arcDirections: 2
-  dial:
+  _sizeNum: 2
+  _size: 2
+  _hull: 9
+  _shield: 3
+  _arcs: 2
+  _dial:
   - {fileID: 21300000, guid: c0342eb9f2d484bae859534b092965eb, type: 3}
   - {fileID: 21300000, guid: 2ab2ebe13b6de478689ef7142ee63636, type: 3}
-  moves:
+  _moves:
   - speed: 0
     maneuver: 0
     direction: 0
@@ -162,4 +163,4 @@ MonoBehaviour:
     difficulty: 
   _colorSchemes:
   - {fileID: 21300000, guid: 8140dc8bf1d264d6e9925d480a5e64ab, type: 3}
-  ability: 
+  _ability: 

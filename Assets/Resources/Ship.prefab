@@ -2958,8 +2958,6 @@ MonoBehaviour:
   shipBody: {fileID: 895114250}
   nameLabel: {fileID: 7340536108728295011}
   selectMarker: {fileID: 275120725742844740}
-  firingArc: {fileID: 949606350038233446}
-  firingArcInternal: {fileID: 5396647463224444336}
   tokens:
   - token: {fileID: 8226422325671515134}
     name: focus
@@ -3027,6 +3025,8 @@ MonoBehaviour:
     stackable: 1
     count: 0
     statusEffect: 0
+  firingArc: {fileID: 949606350038233446}
+  firingArcInternal: {fileID: 5396647463224444336}
   stackSpawn: {fileID: 8598834815689918810}
   templateSpawn: {fileID: 838373989808223433}
   statsLabel: {fileID: 9047141770763326157}
@@ -3037,31 +3037,9 @@ MonoBehaviour:
   basicTokens: {fileID: 3134169974259949074}
   moveIndicator: {fileID: 4071006352730865907}
   deathVFX: {fileID: 159918, guid: a0040bf7072bc2f4e82d887d50a9c5e2, type: 3}
+  relay: {fileID: 0}
   uniqueID: 
   ownShip: 0
-  relay: {fileID: 0}
-  shipTypeConfig:
-    width: 0
-    movement:
-      forward: []
-      bank: []
-      turn: []
-    barrel: []
-    cloak:
-      straight: []
-      left: []
-      right: []
-    objects:
-      _arc: []
-      _template: []
-      _stats: []
-      _coords: []
-      _status: []
-      _basic: []
-      _stress: []
-      _reinforceFore: []
-      _reinforceAft: []
-      _target: []
 --- !u!114 &1861575633973918592
 MonoBehaviour:
   m_ObjectHideFlags: 0

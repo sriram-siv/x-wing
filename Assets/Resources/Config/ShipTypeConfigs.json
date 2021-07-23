@@ -8,9 +8,9 @@
     },
     "barrel": [8, 1],
     "cloak": {
-      "straight": [-12, 0],
-      "left": [-12.45, -5.15],
-      "right": [-12.45, 5.15]
+      "_straight": [-12, 0],
+      "_left": [-12.45, -5.15],
+      "_right": [-12.45, 5.15]
     },
     "objects": {
       "_arc": [0, 2],
@@ -34,9 +34,9 @@
     },
     "barrel": [8, 2],
     "cloak": {
-      "straight": [-8, 0],
-      "left": [-8, 0],
-      "right": [-8, 0]
+      "_straight": [-8, 0],
+      "_left": [-8, 0],
+      "_right": [-8, 0]
     },
     "objects": {
       "_arc": [0, 3],
@@ -60,9 +60,9 @@
     },
     "barrel": [10, 2],
     "cloak": {
-      "straight": [-10, 0],
-      "left": [-10, 0],
-      "right": [-10, 0]
+      "_straight": [-10, 0],
+      "_left": [-10, 0],
+      "_right": [-10, 0]
     },
     "objects": {
       "_arc": [0, 4],

@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
   m_Name: yt2400lightfreighter
   m_EditorClassIdentifier: 
-  size: 2
-  hull: 6
-  shield: 4
-  arcDirections: 2
-  dial:
+  _sizeNum: 2
+  _size: 2
+  _hull: 6
+  _shield: 4
+  _arcs: 2
+  _dial:
   - {fileID: 21300000, guid: 2ead98d865eaa4932aee895a00febfe2, type: 3}
   - {fileID: 21300000, guid: 8245195cf9c0d4d85bc3ca9f13c286e3, type: 3}
-  moves:
+  _moves:
   - speed: 1
     maneuver: 3
     direction: 1
@@ -163,5 +164,5 @@ MonoBehaviour:
   _colorSchemes:
   - {fileID: 21300000, guid: 5a1b1ab81a27f48ab8a3acff8de24aba, type: 3}
   - {fileID: 21300000, guid: f147342fc01f042bd820d6499ed4d899, type: 3}
-  ability: 'Sensor Blindspot: While you perform a primary attack at attack range
+  _ability: 'Sensor Blindspot: While you perform a primary attack at attack range
     0-1, do not apply the range 0-1 bonus and roll 1 fewer attack die.'

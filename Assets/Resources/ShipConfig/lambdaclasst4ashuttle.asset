@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
   m_Name: lambdaclasst4ashuttle
   m_EditorClassIdentifier: 
-  size: 2
-  hull: 6
-  shield: 4
-  arcDirections: 1
-  dial:
+  _sizeNum: 2
+  _size: 2
+  _hull: 6
+  _shield: 4
+  _arcs: 1
+  _dial:
   - {fileID: 21300000, guid: c9e545a65c787426b94f5f965b7ece52, type: 3}
   - {fileID: 21300000, guid: 9dc12d74b6aa94030bdce2ceebb9bacd, type: 3}
-  moves:
+  _moves:
   - speed: 0
     maneuver: 0
     direction: 0
@@ -162,4 +163,4 @@ MonoBehaviour:
     difficulty: 
   _colorSchemes:
   - {fileID: 21300000, guid: 19a3cfb594d134f7292cbab1f7669eb0, type: 3}
-  ability: 
+  _ability: 

@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
   m_Name: aggressorassaultfighter
   m_EditorClassIdentifier: 
-  size: 1.5
-  hull: 5
-  shield: 3
-  arcDirections: 1
-  dial:
+  _sizeNum: 1.5
+  _size: 1
+  _hull: 5
+  _shield: 3
+  _arcs: 1
+  _dial:
   - {fileID: 21300000, guid: 2b2f1b88a792c4171917d127e8a086d5, type: 3}
   - {fileID: 21300000, guid: f652f67882ed8455f8265fc69dd5d3a1, type: 3}
-  moves:
+  _moves:
   - speed: 1
     maneuver: 3
     direction: 1
@@ -162,5 +163,5 @@ MonoBehaviour:
     difficulty: 
   _colorSchemes:
   - {fileID: 21300000, guid: 9146f20fb1b3b4469ac3fc79a1ad3b0d, type: 3}
-  ability: 'Advanced Droid Brain: After you perform a [calculate] action, gain 1
+  _ability: 'Advanced Droid Brain: After you perform a [calculate] action, gain 1
     calculate token.'

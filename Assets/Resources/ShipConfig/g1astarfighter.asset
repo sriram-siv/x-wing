@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
   m_Name: g1astarfighter
   m_EditorClassIdentifier: 
-  size: 1.5
-  hull: 5
-  shield: 4
-  arcDirections: 1
-  dial:
+  _sizeNum: 1.5
+  _size: 1
+  _hull: 5
+  _shield: 4
+  _arcs: 1
+  _dial:
   - {fileID: 21300000, guid: 5316b2b981ed64a57a56f7c4a7ebbe2a, type: 3}
   - {fileID: 21300000, guid: 5eff120a716bd43f1a557ce5c8d78771, type: 3}
-  moves:
+  _moves:
   - speed: 0
     maneuver: 0
     direction: 0
@@ -162,4 +163,4 @@ MonoBehaviour:
     difficulty: 
   _colorSchemes:
   - {fileID: 21300000, guid: fd1856eaff6454a589adf37bca2f700c, type: 3}
-  ability: 
+  _ability: 

@@ -90,6 +90,9 @@ MonoBehaviour:
   - SetPlayerReady
   - SetCharge
   - ChangeArcColor
+  - set_charge
+  - AdjustCharge
+  - Flip
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

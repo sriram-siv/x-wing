@@ -10,24 +10,21 @@ using Photon.Pun;
 
 public class Ship : MonoBehaviour
 {
-  // config params
+  // String References for Finding GameObjects
+  const string SHIPS = "Ships";
 
+  // Config Params
   [SerializeField] GameObject shipBase;
   [SerializeField] GameObject shipBody;
+  // TODO Whats this?
   Sprite[] shipSprites;
   [SerializeField] GameObject nameLabel;
   [SerializeField] GameObject selectMarker;
-
-  Sprite[] arcs = new Sprite[4];
-  Sprite[] arcsInterior = new Sprite[4];
+  [SerializeField] Token[] tokens;
   [SerializeField] GameObject firingArc;
   [SerializeField] GameObject firingArcInternal;
-  [SerializeField] Token[] tokens;
-
-  List<GameObject> tokenStack = new List<GameObject>();
   [SerializeField] GameObject stackSpawn;
   [SerializeField] GameObject templateSpawn;
-
   [SerializeField] GameObject statsLabel;
   [SerializeField] GameObject coordsLabel;
   [SerializeField] GameObject targetLabel;
@@ -35,45 +32,51 @@ public class Ship : MonoBehaviour
   [SerializeField] GameObject displayContainer;
   [SerializeField] GameObject basicTokens;
   [SerializeField] GameObject moveIndicator;
-
+  // 
   [SerializeField] GameObject deathVFX;
+  [SerializeField] PhotonView relay;
+  // 
 
-  const string SHIPS = "Ships";
+  Sprite[] colorSchemes;
+  Sprite[] arcs = new Sprite[4];
+  Sprite[] arcsInterior = new Sprite[4];
+  List<GameObject> tokenStack = new List<GameObject>();
+
 
   // TODO remove this variable eventually
   float shipSize;
-
-  // state variables
-
+  // TODO this should look at the global value
   int velocity = 1;
-  int arcType = 1;
-  int arcDirection = 0;
 
+  // Ship Status
   bool shipActive = false;
   bool shipMoving = false;
   bool arcActive = false;
+  int arcType = 1;
+  int arcDirection = 0;
+  bool locked = false;
+  bool _isCloaked = false;
+  public bool isCloaked { get { return _isCloaked; } }
   bool statsToggle = true;
 
-  // Last Move Details
-  // TODO create reset method
+  // Movement Flags
+  int templateNumber = -1;
   int rotationPerformed = 0;
-  bool reversePerformed = false;
   int barrelDirection = -1;
   int barrelEndPos = 0;
+  int lastMoveStress = 0;
+  bool flipTemplate = false;
+  bool reversePerformed = false;
   bool cancelTemplateDrop = false;
+  // 
 
-  bool locked = false;
-  bool cloaked = false;
-
+  // Collision Detection
   int currentCollisions = 0;
   Vector2 lastSafePosition = new Vector2(0, 0);
   float lastSafeRotation;
-  int lastMoveStress = 0;
-  GameObject dropTemplate;
-  int templateNumber;
-  bool flipTemplate = false;
-  bool cancelExecuteMove = false;
 
+  // Misc
+  bool cancelExecuteMove = false;
   bool manualMode = true;
   bool mouseOver = false;
   Vector3 mouseToCenter;
@@ -84,23 +87,18 @@ public class Ship : MonoBehaviour
     maneuver = ShipConfig.Maneuver.NONE,
     direction = 0,
   };
-
+  ShipTypeConfigs.Values shipTypeConfig;
   string playerName;
+  // TODO do we need serialising?
   [SerializeField] string uniqueID;
+  // TODO fix
   public bool ownShip = false;
 
-  Sprite[] colorSchemes;
-
   // cached references
-
   GameController controller;
   Menu menu;
   ShipMenu shipMenu;
   PhotonView photonView;
-  [SerializeField] PhotonView relay;
-
-  //TODO Organise this reference
-  public ShipTypeConfigs.Values shipTypeConfig;
 
   void Start()
   {
@@ -175,15 +173,9 @@ public class Ship : MonoBehaviour
   private void KTurn()
   {
     int angle = 180;
-    // Turn the ship 90deg if the dhisft key is pressed
-    if (Input.GetKey(KeyCode.LeftShift))
-    {
-      angle = 90;
-    }
-    else if (Input.GetKey(KeyCode.RightShift))
-    {
-      angle = -90;
-    }
+    // Turn the ship 90deg if the shift key is pressed
+    if (Input.GetKey(KeyCode.LeftShift)) { angle = 90; }
+    if (Input.GetKey(KeyCode.RightShift)) { angle = -90; }
 
     controller.LogMove(uniqueID, transform.position, angle, 0);
     transform.Rotate(0, 0, angle);
@@ -213,25 +205,23 @@ public class Ship : MonoBehaviour
 
     CheckForSafety();
 
+    // This isn't actually a reset on tempNum as it is the template used
     templateNumber = 0;
-    // TODO update this
-    // This is because cloak[0] is forward -> should be changed to [2] or as { "forward": [], "left": ... }
-    barrelDirection = direction == "left" ? 1 : 2; // to keep consistency between br and decloak
+    barrelDirection = direction == "left" ? 1 : 2; // 0 = forward as per cloaking
     barrelEndPos = position == "middle" ? 0 : position == "forward" ? 1 : 0;
     rotationPerformed = 0;
   }
 
   public void Cloak()
   {
-    if (cloaked)
+    if (isCloaked)
     {
-      shipMenu.transform.position = transform.position;
-      shipMenu.SetShip(this);
-      shipMenu.OpenDecloakMenu();
+      ActionBar bar = FindObjectOfType<ActionBar>();
+      bar.OpenTab("cloak");
     }
-
     else
     {
+      _isCloaked = true;
       gameObject.GetPhotonView().RPC("ApplyCloakEffect", RpcTarget.AllBuffered, true);
     }
   }
@@ -290,8 +280,6 @@ public class Ship : MonoBehaviour
 
     photonView.RPC("ApplyCloakEffect", RpcTarget.AllBuffered, false);
 
-    // TODO make reset lastMoveInfo -> { templateNum, flipTemplate, ... }
-
     templateNumber = 0;
     if (shipSize == 1) templateNumber = 1;
     if (curve > 0) templateNumber = 6;
@@ -306,11 +294,9 @@ public class Ship : MonoBehaviour
   }
 
   [PunRPC]
-  private void ApplyCloakEffect(bool state)
+  private void ApplyCloakEffect(bool cloakState)
   {
-    cloaked = state;
-
-    shipBody.GetComponent<SpriteRenderer>().color = cloaked
+    shipBody.GetComponent<SpriteRenderer>().color = cloakState
         ? new Color32(70, 50, 255, 150)
         : new Color32(255, 255, 255, 255);
   }
@@ -396,8 +382,8 @@ public class Ship : MonoBehaviour
 
       // Shift the pivot along the y axis towards the other side
       pivot -= reverse
-          ? (-4 * shipSize) / 100f
-          : (4 * shipSize) / 100f;
+          ? (-shipTypeConfig.width) / 100f
+          : (shipTypeConfig.width) / 100f;
       yield return new WaitForEndOfFrame();
       CheckForSafety();
     }
@@ -479,13 +465,7 @@ public class Ship : MonoBehaviour
     arcDirection += direction + 4; // So mod operation will work on negatives
     arcDirection %= 4;
 
-    firingArc.transform.Rotate(0, 0, 90 * direction);
-
-    // Reset angle on full rotation
-    if (firingArc.transform.eulerAngles.z % 360 == 0)
-    {
-      firingArc.transform.rotation = Quaternion.identity;
-    }
+    firingArc.transform.localEulerAngles = new Vector3(0, 0, 90 * arcDirection);
 
     firingArcInternal.transform.GetChild(0).GetComponent<SpriteRenderer>().sprite = arcsInterior[arcDirection];
     firingArcInternal.transform.GetChild(1).GetComponent<SpriteRenderer>().sprite = arcsInterior[(arcDirection + 2) % 4];
@@ -505,6 +485,7 @@ public class Ship : MonoBehaviour
     ToggleSideArc();
   }
 
+  // Angles are different for broadside arcs so this method makes sure the right sprite is used
   private void ToggleSideArc()
   {
     if (arcType == 1)
@@ -823,27 +804,24 @@ public class Ship : MonoBehaviour
     selectMarker.SetActive(false);
   }
 
+  // TODO rename this and rethink(?)
   public void ManualMode()
   {
     manualMode = !manualMode;
   }
-
+  // TODO could this be replaced by reset flags?
+  // if (templateNumber == -1) ??
   [PunRPC]
   public void CancelTemplateDrop()
   {
     cancelTemplateDrop = true;
   }
-
-  public bool GetCloakState()
-  {
-    return cloaked;
-  }
-
+  // TODO use getter
   public int GetArcDirection()
   {
     return arcDirection;
   }
-
+  // TODO use getter
   public string GetUniqueID()
   {
     return uniqueID;
@@ -903,6 +881,7 @@ public class Ship : MonoBehaviour
       {
         vals[i] = tokens[i].count;
       }
+      // TODO can count be added to non-stacking tokens?
       else // Represent active state as 1 (true) or 0 (false)
       {
         vals[i] = tokens[i].token.activeSelf
@@ -919,6 +898,7 @@ public class Ship : MonoBehaviour
     return targetLabel.GetComponentInChildren<TMP_Text>().text;
   }
 
+  // TODO use getter
   public Sprite[] GetColorShemes()
   {
     return colorSchemes;
@@ -933,6 +913,9 @@ public class Ship : MonoBehaviour
 
   private void OnTriggerEnter2D(Collider2D collision)
   {
+    // TODO try collision is Ship?
+    // bool isShip = collision is Ship;
+    // Debug.Log(isShip);
     if (collision.GetComponent<Ship>())
     {
       currentCollisions++;
@@ -958,95 +941,92 @@ public class Ship : MonoBehaviour
 
   [PunRPC]
   private void MoveToSafety()
-  // TODO move to safety doesnt currently interact with barrel rolls
-  // Could remove a lot of this method and leave as manual
   {
     Vector2 initialValue = new Vector2(0, 0);
-    if (lastSafePosition != initialValue && !cancelTemplateDrop)
+    if (lastSafePosition == initialValue || cancelTemplateDrop) return;
+
+    // TODO This has been left in with the matching one below incase it was actually doing something
+    // transform.Rotate(0, 0, -rotationPerformed);
+
+    templateSpawn.transform.localPosition = new Vector3(0, -2 * shipSize);
+    templateSpawn.transform.localEulerAngles = Vector3.zero;
+
+    switch (barrelDirection)
     {
-      transform.Rotate(0, 0, -rotationPerformed);
+      case 1:
+        templateSpawn.transform.localPosition = new Vector3(2 * shipSize, 0);
+        break;
+      case 2:
+        templateSpawn.transform.localPosition = new Vector3(-2 * shipSize, 0);
+        break;
+      default:
+        break;
+    }
+    switch (barrelEndPos)
+    {
+      case 1:
+        templateSpawn.transform.localPosition +=
+            Vector3.down * shipTypeConfig.barrel[1];
+        break;
+      case 2:
+        templateSpawn.transform.localPosition +=
+            Vector3.up * shipTypeConfig.barrel[1];
+        break;
+      default:
+        break;
+    }
+    if (shipSize != 1 && barrelDirection != -1)
+    {
+      float lateralAdjust = barrelDirection == 1
+          ? 1
+          : -1;
+      templateSpawn.transform.localPosition += new Vector3(lateralAdjust, 2);
+    }
 
-      templateSpawn.transform.localPosition = new Vector3(0, -2 * shipSize);
-      templateSpawn.transform.localEulerAngles = Vector3.zero;
+    if (reversePerformed)
+    {
+      templateSpawn.transform.localPosition = new Vector3(0, 2 * shipSize);
+      templateSpawn.transform.localEulerAngles = Vector3.forward * 180;
+    }
 
+    GameObject dropTemplate = PhotonNetwork.Instantiate("Template",
+        templateSpawn.transform.position, templateSpawn.transform.rotation, 0);
+    dropTemplate.GetPhotonView().RPC("InitTemplate", RpcTarget.AllBuffered, templateNumber, flipTemplate);
+
+    if (shipSize == 1)
+    {
       switch (barrelDirection)
       {
         case 1:
-          templateSpawn.transform.localPosition = new Vector3(2 * shipSize, 0);
+          dropTemplate.transform.Rotate(Vector3.forward * 90);
           break;
         case 2:
-          templateSpawn.transform.localPosition = new Vector3(-2 * shipSize, 0);
+          dropTemplate.transform.Rotate(Vector3.forward * -90);
           break;
         default:
           break;
-      }
-      switch (barrelEndPos)
-      {
-        case 1:
-          templateSpawn.transform.localPosition +=
-              Vector3.down * shipTypeConfig.barrel[1];
-          break;
-        case 2:
-          templateSpawn.transform.localPosition +=
-              Vector3.up * shipTypeConfig.barrel[1];
-          break;
-        default:
-          break;
-      }
-      if (shipSize != 1 && barrelDirection != -1)
-      {
-        float lateralAdjust = barrelDirection == 1
-            ? 1
-            : -1;
-        templateSpawn.transform.localPosition += new Vector3(lateralAdjust, 2);
-      }
-
-      if (reversePerformed)
-      {
-        templateSpawn.transform.localPosition = new Vector3(0, 2 * shipSize);
-        templateSpawn.transform.localEulerAngles = Vector3.forward * 180;
-      }
-
-      dropTemplate = PhotonNetwork.Instantiate("Template",
-          templateSpawn.transform.position, templateSpawn.transform.rotation, 0);
-      dropTemplate.GetPhotonView().RPC("InitTemplate", RpcTarget.AllBuffered, templateNumber, flipTemplate);
-
-      if (shipSize == 1)
-      {
-        switch (barrelDirection)
-        {
-          case 1:
-            dropTemplate.transform.Rotate(Vector3.forward * 90);
-            break;
-          case 2:
-            dropTemplate.transform.Rotate(Vector3.forward * -90);
-            break;
-          default:
-            break;
-        }
-      }
-
-      transform.Rotate(0, 0, rotationPerformed);
-
-      if (lastSafePosition != new Vector2(transform.position.x, transform.position.y))
-      {
-        float rotation = lastSafeRotation - transform.eulerAngles.z;
-        controller.LogMove(uniqueID, transform.position, rotation, 0);
-
-        transform.position = new Vector2(lastSafePosition.x, lastSafePosition.y);
-        Vector3 eulerAngles = transform.eulerAngles;
-        eulerAngles.z = lastSafeRotation;
-        transform.eulerAngles = eulerAngles;
-
-        rotationPerformed = 0;
-        cancelTemplateDrop = true;
       }
     }
-  }
 
-  private void ResetZ()
-  {
-    transform.position = new Vector3(transform.position.x, transform.position.y, -1);
+    // TODO Smelly
+    // transform.Rotate(0, 0, rotationPerformed);
+
+    if (lastSafePosition != new Vector2(transform.position.x, transform.position.y))
+    {
+      float rotation = lastSafeRotation - transform.eulerAngles.z;
+      controller.LogMove(uniqueID, transform.position, rotation, 0);
+      // ResetMovementFlags();
+
+      transform.position = lastSafePosition;
+      transform.eulerAngles = new Vector3(
+        transform.eulerAngles.x,
+        transform.eulerAngles.y,
+        lastSafeRotation
+      );
+
+      rotationPerformed = 0;
+      cancelTemplateDrop = true;
+    }
   }
 
   public void SetMoveFromDial(ShipConfig.DialMove move)
@@ -1096,19 +1076,18 @@ public class Ship : MonoBehaviour
     gameObject.name = pilot.name;
     nameLabel.GetComponent<TMP_Text>().text = pilot.name;
     uniqueID = pilot.uniqueID;
-    shipSize = pilot.config.Size();
+    shipSize = pilot.config.sizeNum;
 
     // Set stats from config file
     Stats stats = GetComponent<Stats>();
-    stats.SetHull(pilot.config.Hull());
-    stats.SetShield(pilot.config.Shield());
+    stats.SetHull(pilot.config.hull);
+    stats.SetShield(pilot.config.shield);
     stats.SetInitiative(pilot.initiative);
     stats.SetForce(pilot.force);
     stats.SetCharge(pilot.charges);
 
     controller = FindObjectOfType<GameController>();
-    // TODO move string def into ship config, remove size as float
-    string size = controller.GetShipSize(shipSize);
+    string size = pilot.config.size;
 
     shipBase.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Bases/base-" + size);
     shipBody.GetComponent<SpriteRenderer>().sprite = colorSchemes[0]; //Resources.Load<Sprite>("Ships/" + pilot.config.name);
@@ -1135,19 +1114,19 @@ public class Ship : MonoBehaviour
     firingArcInternal.transform.GetChild(0).GetComponent<SpriteRenderer>().color = arcColor;
     firingArcInternal.transform.GetChild(1).GetComponent<SpriteRenderer>().color = arcColor;
 
-    if (pilot.config.Arcs() == 2)
+    if (pilot.config.arcs == 2)
     {
       firingArc.transform.GetChild(1).gameObject.SetActive(true);
       firingArcInternal.transform.GetChild(1).gameObject.SetActive(true);
       firingArc.transform.GetChild(1).transform.localPosition += new Vector3(0, -2, 0) * shipSize;
     }
 
+    // TODO move this up to top of block
     shipTypeConfig = JsonUtility.FromJson<ShipTypeConfigs>(
         Resources.Load<TextAsset>("Config/ShipTypeConfigs").ToString()
     )[size];
 
     // Configure ship size variables
-    // TODO test with all sizes
     selectMarker.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("UI/ship-marker-" + shipSize);
     firingArc.transform.GetChild(0).localPosition = shipTypeConfig.objects.arc;
     templateSpawn.transform.localPosition = shipTypeConfig.objects.template;
@@ -1160,7 +1139,6 @@ public class Ship : MonoBehaviour
     tokens[3].token.transform.localPosition = shipTypeConfig.objects.reinforceAft;
     targetLabel.transform.localPosition = shipTypeConfig.objects.target;
 
-    // TODO test this is now working
     GetComponent<BoxCollider2D>().size = new Vector2(shipTypeConfig.width, shipTypeConfig.width);
 
     transform.SetParent(GameObject.Find(SHIPS).transform);
@@ -1251,27 +1229,7 @@ public class Ship : MonoBehaviour
     RestackTokens();
   }
 
-  public void OpenSubMenu(string action)
-  {
-    shipMenu.SetShip(this);
-
-    switch (action)
-    {
-      case "barrel":
-        shipMenu.OpenBarrelMenu();
-        break;
-      case "boost":
-        shipMenu.OpenBoostMenu();
-        break;
-      case "device":
-        shipMenu.OpenDeviceMenu();
-        break;
-      default:
-        break;
-    }
-  }
-
-  // TODO move controls definitions to separate file - json file?
+  // TODO move controls definitions to separate file - scriptable object?
   private void Controls()
   {
     bool destroy = Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.D);
@@ -1380,7 +1338,21 @@ public class Ship : MonoBehaviour
       ActionBar bar = FindObjectOfType<ActionBar>();
       // TODO make this reclosable with B
       bar.ToggleActionBar(2);
-      bar.OpenBarrelTab();
+      bar.OpenTab("barrel");
     }
+  }
+
+  // TODO finish, implement and thoroughly test this
+  // LogMove(); ResetFlags()
+  private void ResetMovementFlags()
+  {
+    templateNumber = -1;
+    rotationPerformed = 0;
+    barrelDirection = -1;
+    barrelEndPos = 0;
+    lastMoveStress = 0;
+    flipTemplate = false;
+    reversePerformed = false;
+    cancelTemplateDrop = false;
   }
 }

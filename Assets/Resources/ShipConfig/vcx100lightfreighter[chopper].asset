@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
   m_Name: vcx100lightfreighter[chopper]
   m_EditorClassIdentifier: 
-  size: 2
-  hull: 10
-  shield: 4
-  arcDirections: 1
-  dial:
+  _sizeNum: 2
+  _size: 2
+  _hull: 10
+  _shield: 4
+  _arcs: 1
+  _dial:
   - {fileID: 21300000, guid: 292a917f384e643d8a74213ffbc7e492, type: 3}
   - {fileID: 21300000, guid: fcaab78512cc64616830d98784792ee8, type: 3}
-  moves:
+  _moves:
   - speed: 1
     maneuver: 3
     direction: 1
@@ -162,6 +163,6 @@ MonoBehaviour:
     difficulty: 
   _colorSchemes:
   - {fileID: 21300000, guid: 5c9cd8a72c24c4d8b9d568d1a4276738, type: 3}
-  ability: "Tail Gun: While you have a docked ship, you have a primary  [auxilliary
+  _ability: "Tail Gun: While you have a docked ship, you have a primary  [auxilliary
     arc] weapon with an attack value equal to your docked ship\u2019s primary [front
     arc] attack value."

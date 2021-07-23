@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
   m_Name: tiereaper
   m_EditorClassIdentifier: 
-  size: 1.5
-  hull: 6
-  shield: 2
-  arcDirections: 1
-  dial:
+  _sizeNum: 1.5
+  _size: 1
+  _hull: 6
+  _shield: 2
+  _arcs: 1
+  _dial:
   - {fileID: 21300000, guid: 4f97c0e86e99e4232a014684d5de16ac, type: 3}
   - {fileID: 21300000, guid: e8d47b73310864a6f8c1ea32be802353, type: 3}
-  moves:
+  _moves:
   - speed: 0
     maneuver: 0
     direction: 0
@@ -162,5 +163,5 @@ MonoBehaviour:
     difficulty: 
   _colorSchemes:
   - {fileID: 21300000, guid: 3747001ac33924a67a1d5f2744240617, type: 3}
-  ability: 'Adaptive Ailerons: Before you reveal your dial, if you are not stressed,
+  _ability: 'Adaptive Ailerons: Before you reveal your dial, if you are not stressed,
     you must execute a white [1 forward] or [1 bank ] maneuver.'

@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
   m_Name: alphaclassstarwing
   m_EditorClassIdentifier: 
-  size: 1
-  hull: 4
-  shield: 3
-  arcDirections: 1
-  dial:
+  _sizeNum: 1
+  _size: 0
+  _hull: 4
+  _shield: 3
+  _arcs: 1
+  _dial:
   - {fileID: 21300000, guid: 14abc11b1f1e94518b3663e11caac6bc, type: 3}
   - {fileID: 21300000, guid: 8bcb2775f54634f28a8c64690ead832b, type: 3}
-  moves:
+  _moves:
   - speed: 0
     maneuver: 0
     direction: 0
@@ -162,4 +163,4 @@ MonoBehaviour:
     difficulty: 
   _colorSchemes:
   - {fileID: 21300000, guid: 0c7b5dc9dc7194a3e9233a38fb9d21bb, type: 3}
-  ability: 
+  _ability: 

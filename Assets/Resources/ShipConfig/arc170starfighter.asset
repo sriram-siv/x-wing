@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
   m_Name: arc170starfighter
   m_EditorClassIdentifier: 
-  size: 1.5
-  hull: 6
-  shield: 3
-  arcDirections: 2
-  dial:
+  _sizeNum: 1.5
+  _size: 1
+  _hull: 6
+  _shield: 3
+  _arcs: 2
+  _dial:
   - {fileID: 21300000, guid: 56898fc5b363b4be8a6955a041eb2a25, type: 3}
   - {fileID: 21300000, guid: 3890040de955447e5806b1166b9b687e, type: 3}
-  moves:
+  _moves:
   - speed: 0
     maneuver: 0
     direction: 0
@@ -163,4 +164,4 @@ MonoBehaviour:
   _colorSchemes:
   - {fileID: 21300000, guid: cfc3e9717549a4e8d846bf37c47c0384, type: 3}
   - {fileID: 21300000, guid: 2916f2ccc1ace45519ca697c2241297b, type: 3}
-  ability: 
+  _ability: 

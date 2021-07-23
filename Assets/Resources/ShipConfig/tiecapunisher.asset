@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
   m_Name: tiecapunisher
   m_EditorClassIdentifier: 
-  size: 1.5
-  hull: 6
-  shield: 3
-  arcDirections: 1
-  dial:
+  _sizeNum: 1.5
+  _size: 1
+  _hull: 6
+  _shield: 3
+  _arcs: 1
+  _dial:
   - {fileID: 21300000, guid: 59dc25c9e11c94e2199231668b6a20ad, type: 3}
   - {fileID: 21300000, guid: 7971f51d6b73949a8837362f34c93f31, type: 3}
-  moves:
+  _moves:
   - speed: 0
     maneuver: 0
     direction: 0
@@ -162,4 +163,4 @@ MonoBehaviour:
     difficulty: 
   _colorSchemes:
   - {fileID: 21300000, guid: 5a15dd71b15bf4d6cab51bbe16035974, type: 3}
-  ability: 
+  _ability: 

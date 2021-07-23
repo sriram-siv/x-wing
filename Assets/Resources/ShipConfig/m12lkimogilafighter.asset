@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
   m_Name: m12lkimogilafighter
   m_EditorClassIdentifier: 
-  size: 1.5
-  hull: 7
-  shield: 2
-  arcDirections: 1
-  dial:
+  _sizeNum: 1.5
+  _size: 1
+  _hull: 7
+  _shield: 2
+  _arcs: 1
+  _dial:
   - {fileID: 21300000, guid: 0e9a7f831531749b58629c0a554e8ddb, type: 3}
   - {fileID: 21300000, guid: 3925a340004404023853d559fee91744, type: 3}
-  moves:
+  _moves:
   - speed: 1
     maneuver: 3
     direction: 1
@@ -162,5 +163,5 @@ MonoBehaviour:
     difficulty: 
   _colorSchemes:
   - {fileID: 21300000, guid: 231cc44bb2e9f4d7e89873ce77dbcb1a, type: 3}
-  ability: 'Dead to Rights: While you perform an attack, if the defender is in your
+  _ability: 'Dead to Rights: While you perform an attack, if the defender is in your
     [bullseye arc], defense dice cannot be modified using green tokens.'

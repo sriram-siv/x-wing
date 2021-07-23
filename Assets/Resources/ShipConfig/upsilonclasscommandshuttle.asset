@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b774aecc503744fcd9e9c10307a1e919, type: 3}
   m_Name: upsilonclasscommandshuttle
   m_EditorClassIdentifier: 
-  size: 2
-  hull: 6
-  shield: 6
-  arcDirections: 1
-  dial:
+  _sizeNum: 2
+  _size: 2
+  _hull: 6
+  _shield: 6
+  _arcs: 1
+  _dial:
   - {fileID: 21300000, guid: 5874e96308bc24a9a839075e6c4b01b4, type: 3}
   - {fileID: 21300000, guid: 939a296141cde4ff0a3bb8a4a0ddc694, type: 3}
-  moves:
+  _moves:
   - speed: 0
     maneuver: 0
     direction: 0
@@ -162,7 +163,7 @@ MonoBehaviour:
     difficulty: 
   _colorSchemes:
   - {fileID: 21300000, guid: 4026d964bb44a4f77959f1b9116c140a, type: 3}
-  ability: 'Linked Battery:
+  _ability: 'Linked Battery:
 
 
     While you perform a [cannon] attack, roll 1 additional

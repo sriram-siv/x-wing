@@ -2,8 +2,6 @@ using UnityEngine;
 
 // Type definition for ship size related variables object
 // ? Getter values used to transform array into Vector3 in order to simplify json file
-
-// TODO remove serialization and make _fields private
 [System.Serializable]
 public struct ShipTypeConfigs
 {
@@ -24,9 +22,9 @@ public struct ShipTypeConfigs
     [System.Serializable]
     public struct Cloak
     {
-      public float[] straight;
-      public float[] left;
-      public float[] right;
+      public float[] _straight;
+      public float[] _left;
+      public float[] _right;
       public Vector3 this[int curve]
       {
         get
@@ -34,13 +32,13 @@ public struct ShipTypeConfigs
           switch (curve)
           {
             case 0:
-              return new Vector3(this.straight[0], this.straight[1]);
+              return new Vector3(this._straight[0], this._straight[1]);
             case 1:
-              return new Vector3(this.left[0], this.left[1]);
+              return new Vector3(this._left[0], this._left[1]);
             case 2:
-              return new Vector3(this.right[0], this.right[1]);
+              return new Vector3(this._right[0], this._right[1]);
             default:
-              return new Vector3(this.straight[0], this.straight[1]);
+              return new Vector3(this._straight[0], this._straight[1]);
           }
         }
       }
