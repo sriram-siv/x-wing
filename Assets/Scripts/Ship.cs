@@ -57,7 +57,6 @@ public class Ship : MonoBehaviour
   bool locked = false;
   bool _isCloaked = false;
   public bool isCloaked { get { return _isCloaked; } }
-  bool statsToggle = true;
 
   // Movement Flags
   int templateNumber = -1;
@@ -66,9 +65,8 @@ public class Ship : MonoBehaviour
   int barrelEndPos = 0;
   int lastMoveStress = 0;
   bool flipTemplate = false;
-  bool reversePerformed = false;
+  bool dropTemplateFromFront = false;
   bool cancelTemplateDrop = false;
-  // 
 
   // Collision Detection
   int currentCollisions = 0;
@@ -77,8 +75,8 @@ public class Ship : MonoBehaviour
 
   // Misc
   bool cancelExecuteMove = false;
-  bool manualMode = true;
-  bool mouseOver = false;
+  bool _mouseOver = false;
+  public bool mouseOver { get { return _mouseOver; } }
   Vector3 mouseToCenter;
 
   ShipConfig.DialMove dialMove = new ShipConfig.DialMove()
@@ -90,7 +88,7 @@ public class Ship : MonoBehaviour
   ShipTypeConfigs.Values shipTypeConfig;
   string playerName;
   // TODO do we need serialising?
-  [SerializeField] string uniqueID;
+  string uniqueID;
   // TODO fix
   public bool ownShip = false;
 
@@ -98,6 +96,7 @@ public class Ship : MonoBehaviour
   GameController controller;
   Menu menu;
   ShipMenu shipMenu;
+  ActionBar actionBar;
   PhotonView photonView;
 
   void Start()
@@ -105,6 +104,7 @@ public class Ship : MonoBehaviour
     controller = FindObjectOfType<GameController>();
     menu = FindObjectOfType<Menu>();
     shipMenu = FindObjectOfType<ShipMenu>();
+    actionBar = FindObjectOfType<ActionBar>();
 
     photonView = gameObject.GetComponent<PhotonView>();
     playerName = photonView.Owner.NickName;
@@ -134,39 +134,38 @@ public class Ship : MonoBehaviour
 
   private void ExecuteMovement()
   {
-    // Movement Controls
-    if (!arcActive && !manualMode)
-    {
-      string message = FindObjectOfType<Loader>().GetPlayerName() + " performed a manual move (" + name + ")";
-
-      float angle = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)
-          ? 90f
-          : 45f;
-
-      if (Input.GetKeyDown(KeyCode.DownArrow))
-      {
-        KTurn();
-        relay.RPC("SendAlertMessage", RpcTarget.AllBuffered, message, 5);
-      }
-      else if (Input.GetKeyDown(KeyCode.UpArrow))
-      {
-        StartCoroutine(Forward(velocity));
-        relay.RPC("SendAlertMessage", RpcTarget.AllBuffered, message, 5);
-      }
-      else if (Input.GetKeyDown(KeyCode.LeftArrow))
-      {
-        StartCoroutine(Turn(angle, Mathf.Clamp(velocity - 1, 0, 2), 1));
-        relay.RPC("SendAlertMessage", RpcTarget.AllBuffered, message, 5);
-      }
-      else if (Input.GetKeyDown(KeyCode.RightArrow))
-      {
-        StartCoroutine(Turn(angle, Mathf.Clamp(velocity - 1, 0, 2), -1));
-        relay.RPC("SendAlertMessage", RpcTarget.AllBuffered, message, 5);
-      }
-    }
-    else if (manualMode)
+    if (menu.isManualMode)
     {
       ManualMovement();
+      return;
+    }
+    if (arcActive) return;
+    // Movement Controls
+    string message = FindObjectOfType<Loader>().GetPlayerName() + " performed a manual move (" + name + ")";
+
+    float angle = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)
+        ? 90f
+        : 45f;
+
+    if (Input.GetKeyDown(KeyCode.DownArrow))
+    {
+      KTurn();
+      relay.RPC("SendAlertMessage", RpcTarget.AllBuffered, message, 5);
+    }
+    else if (Input.GetKeyDown(KeyCode.UpArrow))
+    {
+      StartCoroutine(Forward(velocity));
+      relay.RPC("SendAlertMessage", RpcTarget.AllBuffered, message, 5);
+    }
+    else if (Input.GetKeyDown(KeyCode.LeftArrow))
+    {
+      StartCoroutine(Turn(angle, Mathf.Clamp(velocity - 1, 0, 2), 1));
+      relay.RPC("SendAlertMessage", RpcTarget.AllBuffered, message, 5);
+    }
+    else if (Input.GetKeyDown(KeyCode.RightArrow))
+    {
+      StartCoroutine(Turn(angle, Mathf.Clamp(velocity - 1, 0, 2), -1));
+      relay.RPC("SendAlertMessage", RpcTarget.AllBuffered, message, 5);
     }
   }
 
@@ -178,6 +177,7 @@ public class Ship : MonoBehaviour
     if (Input.GetKey(KeyCode.RightShift)) { angle = -90; }
 
     controller.LogMove(uniqueID, transform.position, angle, 0);
+    ResetMovementFlags();
     transform.Rotate(0, 0, angle);
   }
 
@@ -192,6 +192,7 @@ public class Ship : MonoBehaviour
   public void BarrelRoll(string direction, string position)
   {
     controller.LogMove(uniqueID, transform.position, 0, 0);
+    ResetMovementFlags();
 
     float lateralMovement = -shipTypeConfig.barrel[0];
     if (direction == "right") lateralMovement = shipTypeConfig.barrel[0];
@@ -205,19 +206,17 @@ public class Ship : MonoBehaviour
 
     CheckForSafety();
 
-    // This isn't actually a reset on tempNum as it is the template used
     templateNumber = 0;
     barrelDirection = direction == "left" ? 1 : 2; // 0 = forward as per cloaking
-    barrelEndPos = position == "middle" ? 0 : position == "forward" ? 1 : 0;
-    rotationPerformed = 0;
+    if (position == "forward") barrelEndPos = 1;
+    if (position == "back") barrelEndPos = 2;
   }
 
   public void Cloak()
   {
     if (isCloaked)
     {
-      ActionBar bar = FindObjectOfType<ActionBar>();
-      bar.ToggleBar("cloak");
+      actionBar.ToggleBar("cloak");
     }
     else
     {
@@ -241,6 +240,7 @@ public class Ship : MonoBehaviour
     if (curve == 2) angle = -45;
 
     controller.LogMove(uniqueID, transform.position, angle, 0);
+    ResetMovementFlags();
 
     // Decloak forward
     if (direction == 0)
@@ -274,23 +274,19 @@ public class Ship : MonoBehaviour
       if (position == 1) adjust = shipTypeConfig.barrel[1];
       if (position == 2) adjust = -shipTypeConfig.barrel[1];
       transform.Translate(new Vector3(0, adjust));
+
+      // Flags
+      templateNumber = 0;
+      if (shipSize == 1) templateNumber = 1;
+      if (curve > 0) templateNumber = 6;
+      if (curve == 2) flipTemplate = true;
+      barrelDirection = direction;
+      // Make sure no adjustment is made for forward decloaking
+      if (direction > 0) barrelEndPos = position;
     }
 
     CheckForSafety();
-
     photonView.RPC("ApplyCloakEffect", RpcTarget.AllBuffered, false);
-
-    templateNumber = 0;
-    if (shipSize == 1) templateNumber = 1;
-    if (curve > 0) templateNumber = 6;
-    flipTemplate = curve == 2;
-
-    barrelDirection = -1;
-    if (direction > 0) barrelDirection = direction;
-    // Make sure no adjustment is made for forward decloaking
-    barrelEndPos = 0;
-    if (direction > 0) barrelEndPos = position;
-    rotationPerformed = 0;
   }
 
   [PunRPC]
@@ -306,7 +302,7 @@ public class Ship : MonoBehaviour
     lastSafePosition = transform.position;
     lastSafeRotation = transform.eulerAngles.z;
     controller.LogMove(uniqueID, transform.position, endRotation, lastMoveStress);
-    lastMoveStress = 0;
+    ResetMovementFlags();
     shipMoving = true;
 
     // TODO remove factor4
@@ -324,15 +320,12 @@ public class Ship : MonoBehaviour
     }
 
     transform.Rotate(0, 0, endRotation);
-    rotationPerformed = endRotation;
 
-    reversePerformed = reverse;
+    rotationPerformed = endRotation;
+    dropTemplateFromFront = reverse || endRotation == 180;
+    templateNumber = moveVelocity - 1;
 
     shipMoving = false;
-    templateNumber = moveVelocity - 1;
-    flipTemplate = false;
-    cancelTemplateDrop = false;
-    barrelDirection = -1;
 
     if (menu.GetShowTemplates())
     {
@@ -344,7 +337,7 @@ public class Ship : MonoBehaviour
   IEnumerator Turn(float angle, int speed, int direction, int endRotation = 0, bool reverse = false)
   {
     controller.LogMove(uniqueID, transform.position, (angle + endRotation) * direction, lastMoveStress);
-    lastMoveStress = 0;
+    ResetMovementFlags();
     shipMoving = true;
 
     // Get the turn radius for this ship size and determine the pivot and step increment
@@ -389,18 +382,15 @@ public class Ship : MonoBehaviour
     }
 
     transform.Rotate(0, 0, endRotation * direction);
-    rotationPerformed = endRotation * direction;
-    reversePerformed = reverse;
 
-    shipMoving = false;
+    rotationPerformed = endRotation * direction;
+    dropTemplateFromFront = reverse || endRotation == 180;
     templateNumber = angle == 90
         ? speed + 8
         : speed + 5;
-    flipTemplate = direction == 1
-        ? false
-        : true;
-    cancelTemplateDrop = false;
+    if (direction == -1) flipTemplate = true;
     barrelDirection = -1;
+    shipMoving = false;
   }
 
   private void ManualMovement()
@@ -738,9 +728,8 @@ public class Ship : MonoBehaviour
       shipActive = true;
       selectMarker.SetActive(true);
 
-      ActionBar bar = FindObjectOfType<ActionBar>();
-      bar.attachedShip = this;
-      bar.ToggleBar("collapsed");
+      actionBar.attachedShip = this;
+      actionBar.ToggleBar("collapsed");
 
       Hazards[] hazards = FindObjectsOfType<Hazards>();
       foreach (Hazards hazard in hazards) { hazard.Deselect(); }
@@ -752,7 +741,6 @@ public class Ship : MonoBehaviour
 
   public void HighlightShip(bool state)
   {
-    nameLabel.SetActive(state);
     selectMarker.SetActive(state);
   }
 
@@ -767,12 +755,11 @@ public class Ship : MonoBehaviour
 
   private void OnMouseDrag()
   {
-    if (manualMode && !menu.CheckOpenHand() && !menu.CheckMenuOpen())
+    if (menu.isManualMode && !menu.CheckOpenHand() && !menu.CheckMenuOpen())
     {
-      // TODO can we just used Input.mousePosition directly here?
-      Vector3 trans = Camera.main.ScreenToWorldPoint(
-          new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
-      trans -= mouseToCenter;
+      Vector3 trans =
+        Camera.main.ScreenToWorldPoint(Input.mousePosition) - mouseToCenter;
+      // Rounds to 1 decimal point
       float xPos = Mathf.Round(trans.x * 10) / 10;
       float yPos = Mathf.Round(trans.y * 10) / 10;
       transform.position = new Vector3(xPos + 0.0111f, yPos, -1);
@@ -789,18 +776,12 @@ public class Ship : MonoBehaviour
   private void OnMouseOver()
   {
     nameLabel.SetActive(true);
-    mouseOver = true;
-  }
-
-  public bool CheckForMouseOver()
-  {
-    // TODO use getter on _mouseOver instead
-    return mouseOver;
+    _mouseOver = true;
   }
 
   private void OnMouseExit()
   {
-    mouseOver = false;
+    _mouseOver = false;
     nameLabel.SetActive(false);
   }
 
@@ -810,18 +791,6 @@ public class Ship : MonoBehaviour
     selectMarker.SetActive(false);
   }
 
-  // TODO rename this and rethink(?)
-  public void ManualMode()
-  {
-    manualMode = !manualMode;
-  }
-  // TODO could this be replaced by reset flags?
-  // if (templateNumber == -1) ??
-  [PunRPC]
-  public void CancelTemplateDrop()
-  {
-    cancelTemplateDrop = true;
-  }
   // TODO use getter
   public int GetArcDirection()
   {
@@ -919,9 +888,6 @@ public class Ship : MonoBehaviour
 
   private void OnTriggerEnter2D(Collider2D collision)
   {
-    // TODO try collision is Ship?
-    // bool isShip = collision is Ship;
-    // Debug.Log(isShip);
     if (collision.GetComponent<Ship>())
     {
       currentCollisions++;
@@ -948,8 +914,9 @@ public class Ship : MonoBehaviour
   [PunRPC]
   private void MoveToSafety()
   {
+    // TODO Try lastSafePosition == null ?
     Vector2 initialValue = new Vector2(0, 0);
-    if (lastSafePosition == initialValue || cancelTemplateDrop) return;
+    if (lastSafePosition == initialValue || templateNumber == -1) return;
 
     // TODO This has been left in with the matching one below incase it was actually doing something
     // transform.Rotate(0, 0, -rotationPerformed);
@@ -989,7 +956,7 @@ public class Ship : MonoBehaviour
       templateSpawn.transform.localPosition += new Vector3(lateralAdjust, 2);
     }
 
-    if (reversePerformed)
+    if (dropTemplateFromFront)
     {
       templateSpawn.transform.localPosition = new Vector3(0, 2 * shipSize);
       templateSpawn.transform.localEulerAngles = Vector3.forward * 180;
@@ -1021,7 +988,7 @@ public class Ship : MonoBehaviour
     {
       float rotation = lastSafeRotation - transform.eulerAngles.z;
       controller.LogMove(uniqueID, transform.position, rotation, 0);
-      // ResetMovementFlags();
+      ResetMovementFlags();
 
       transform.position = lastSafePosition;
       transform.eulerAngles = new Vector3(
@@ -1030,7 +997,6 @@ public class Ship : MonoBehaviour
         lastSafeRotation
       );
 
-      rotationPerformed = 0;
       cancelTemplateDrop = true;
     }
   }
@@ -1050,6 +1016,7 @@ public class Ship : MonoBehaviour
         : false;
   }
 
+  // TODO use setter
   public void ToggleMoveIndicator(bool state)
   {
     moveIndicator.SetActive(state);
@@ -1341,15 +1308,12 @@ public class Ship : MonoBehaviour
 
     if (barrelRoll)
     {
-      ActionBar bar = FindObjectOfType<ActionBar>();
-      // TODO make this reclosable with B
-      bar.ToggleBar("main");
+      actionBar.ToggleBar("barrel");
     }
   }
 
-  // TODO finish, implement and thoroughly test this
-  // LogMove(); ResetFlags()
-  private void ResetMovementFlags()
+  [PunRPC]
+  public void ResetMovementFlags()
   {
     templateNumber = -1;
     rotationPerformed = 0;
@@ -1357,7 +1321,6 @@ public class Ship : MonoBehaviour
     barrelEndPos = 0;
     lastMoveStress = 0;
     flipTemplate = false;
-    reversePerformed = false;
-    cancelTemplateDrop = false;
+    dropTemplateFromFront = false;
   }
 }

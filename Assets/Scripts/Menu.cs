@@ -59,7 +59,9 @@ public class Menu : MonoBehaviour
 
   bool menuVisible = false;
   bool handVisible = false;
+
   bool manualModeOn = true;
+  public bool isManualMode { get { return manualModeOn; } }
   bool rangeModeOn = false;
   int zoom = -3;
   bool damageHover = false;
@@ -164,10 +166,6 @@ public class Menu : MonoBehaviour
     manualModeOn = !manualModeOn;
     guides.SetActive(manualModeOn);
 
-    foreach (Ship ship in FindObjectsOfType<Ship>())
-    {
-      ship.ManualMode();
-    }
     foreach (Hazards hazard in FindObjectsOfType<Hazards>())
     {
       bool withinMapX = hazard.transform.position.x > 0 && hazard.transform.position.x < 92;
@@ -381,7 +379,7 @@ public class Menu : MonoBehaviour
     Dial activeDial = null;
     foreach (Dial dial in FindObjectsOfType<Dial>())
     {
-      if (dial.IsSelected())
+      if (dial.isSelected)
       {
         activeDial = dial;
       }
@@ -399,9 +397,9 @@ public class Menu : MonoBehaviour
     newDamage.GetComponent<DamageDeck>().SetPilot(activeDial.name.Replace("_dial", ""));
     newDamage.GetComponent<DamageDeck>().SetAsOwn();
 
-    newDamage.transform.parent = activeDial.GetDamageObj().transform;
+    newDamage.transform.parent = activeDial.damageContainer;
 
-    int cardNum = (activeDial.GetDamageObj().transform.childCount - 1) % 21;
+    int cardNum = (activeDial.damageContainer.childCount - 1) % 21;
     float yPos = Mathf.Floor(cardNum / 7) * 20;
     Vector3 cardPos = new Vector3((cardNum % 7) * 15, yPos);
     newDamage.transform.localPosition = cardPos;
@@ -477,7 +475,7 @@ public class Menu : MonoBehaviour
   {
     foreach (Dial dial in FindObjectsOfType<Dial>())
     {
-      dial.SetScreenPosition();
+      dial.UpdateScreenPosition();
     }
   }
 
@@ -489,7 +487,7 @@ public class Menu : MonoBehaviour
     foreach (Dial dial in FindObjectsOfType<Dial>())
     {
       dial.transform.localScale = new Vector3(dialScale, dialScale, 1);
-      dial.transform.position = Camera.main.ScreenToWorldPoint(dial.GetScreenPosition());
+      dial.transform.position = Camera.main.ScreenToWorldPoint(dial.screenPosition);
 
       dial.AnchorUpgradesDisplay();
     }
@@ -502,7 +500,7 @@ public class Menu : MonoBehaviour
     Dial[] dials = FindObjectsOfType<Dial>();
     foreach (Dial dial in dials)
     {
-      if (!dial.mouseOver)
+      if (!dial.isSelected)
       {
         dial.Deselect();
       }

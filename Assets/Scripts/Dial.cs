@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
-using Photon.Pun;
+using System;
 
 public class Dial : MonoBehaviour
 {
@@ -14,19 +12,21 @@ public class Dial : MonoBehaviour
   [SerializeField] GameObject upgradeTitle;
   [SerializeField] GameObject ability;
   [SerializeField] GameObject abilityShipDisplay;
-  [SerializeField] GameObject damage;
   [SerializeField] GameObject renameInput;
+  [SerializeField] GameObject damage;
 
-  bool selected = false;
+  public Transform damageContainer { get { return damage.transform; } }
+
+  bool _isSelected = false;
+  public bool isSelected { get { return _isSelected; } }
   bool dialActive = false;
   bool _mouseOver = false;
   public bool mouseOver { get { return _mouseOver; } }
 
   Vector2 moveSelect;
-
   Vector3 mouseToCenter;
-
-  Vector3 screenPosition;
+  Vector3 _screenPosition;
+  public Vector3 screenPosition { get { return _screenPosition; } }
 
   int totalUpgrades = 0;
   bool _ownShip = false;
@@ -34,7 +34,6 @@ public class Dial : MonoBehaviour
 
   [SerializeField] GameObject attachedShip;
   [SerializeField] ShipConfig.DialMove[] dialMoves;
-
   [SerializeField] GameObject damageCard;
 
   void Start()
@@ -52,7 +51,7 @@ public class Dial : MonoBehaviour
 
   void Update()
   {
-    if (ownShip && selected && dialActive)
+    if (ownShip && isSelected && dialActive)
     {
       MoveCursor();
     }
@@ -63,7 +62,7 @@ public class Dial : MonoBehaviour
     Dial[] allDials = FindObjectsOfType<Dial>();
     foreach (Dial dial in allDials)
     {
-      dial.Deselect();
+      if (dial != this) dial.Deselect();
       if (dial.transform.position.z == zIndex && dial != topDial)
       {
         dial.transform.position += new Vector3(0, 0, 0.3f);
@@ -74,9 +73,6 @@ public class Dial : MonoBehaviour
 
   private void MoveCursor()
   {
-    // Keeping this here for reference in case this is a useful idea elsewhere
-    // float componentResizeRatio = Camera.main.orthographicSize / 41.5f; // Camera starting size at min zoom
-
     bool hasUpdated = false;
 
     if (Input.GetKeyDown(KeyCode.LeftArrow))
@@ -132,11 +128,10 @@ public class Dial : MonoBehaviour
     transform.position = new Vector3(transform.position.x, transform.position.y, -10);
     CascadeDials(transform.position.z, this);
 
-    selected = true;
+    _isSelected = true;
     dialActive = true;
     upgrades.SetActive(true);
     damage.SetActive(true);
-    GetAttachedShip().HighlightShip(true);
 
     AnchorUpgradesDisplay();
     UpgradeCard[] upgradeCards = FindObjectsOfType<UpgradeCard>();
@@ -145,20 +140,24 @@ public class Dial : MonoBehaviour
       upgrade.ResetCardPosition();
       ability.SetActive(false);
     }
+
+    GetAttachedShip().HighlightShip(true);
   }
 
   public void Deselect()
   {
-    selected = false;
+    _isSelected = false;
     upgrades.SetActive(false);
     damage.SetActive(false);
+    Debug.Log("Deselect: " + name);
+    // TODO still cant click off and unhighlight a ship??
     attachedShip.GetComponent<Ship>().HighlightShip(false);
   }
 
   public void SetDialActive(bool state)
   {
     dialActive = state;
-    attachedShip.GetComponent<Ship>().HighlightShip(true);
+    attachedShip.GetComponent<Ship>().HighlightShip(_isSelected);
   }
 
   public void AnchorUpgradesDisplay()
@@ -191,8 +190,10 @@ public class Dial : MonoBehaviour
 
   private void OnMouseExit()
   {
+    Debug.Log("exiting collider: " + name);
+    Debug.Log("active: " + dialActive);
     _mouseOver = false;
-    if (!dialActive) attachedShip.GetComponent<Ship>().HighlightShip(false);
+    attachedShip.GetComponent<Ship>().HighlightShip(_isSelected);
   }
 
   public void SetMouseOver(bool state)
@@ -341,23 +342,8 @@ public class Dial : MonoBehaviour
     name = shipName + "_dial";
   }
 
-  public void SetScreenPosition()
+  public void UpdateScreenPosition()
   {
-    screenPosition = Camera.main.WorldToScreenPoint(transform.position);
-  }
-
-  public Vector3 GetScreenPosition()
-  {
-    return screenPosition;
-  }
-
-  public bool IsSelected()
-  {
-    return selected;
-  }
-
-  public GameObject GetDamageObj()
-  {
-    return damage;
+    _screenPosition = Camera.main.WorldToScreenPoint(transform.position);
   }
 }

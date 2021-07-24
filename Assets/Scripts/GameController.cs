@@ -164,7 +164,7 @@ public class GameController : MonoBehaviour
                 -moveLog.Last().stress
             );
 
-            ship.gameObject.GetPhotonView().RPC("CancelTemplateDrop", RpcTarget.AllBuffered);
+            ship.gameObject.GetPhotonView().RPC("ResetMovementFlags", RpcTarget.AllBuffered);
 
             moveLog.RemoveAt(moveLog.Count() - 1);
 
@@ -235,17 +235,16 @@ public class GameController : MonoBehaviour
     {
       if (!actionBar.isMouseOver)
       {
+        Menu menu = FindObjectOfType<Menu>();
         Ship[] ships = FindObjectsOfType<Ship>();
         bool mouseOverShip = false;
         foreach (Ship ship in ships)
         {
-          if (!ship.CheckForMouseOver())
+          if (ship.mouseOver) mouseOverShip = true;
+
+          if (!ship.mouseOver && !menu.CheckOpenHand())
           {
             ship.DeselectShip();
-          }
-          else
-          {
-            mouseOverShip = true;
           }
         }
 
