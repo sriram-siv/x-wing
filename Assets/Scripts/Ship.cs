@@ -70,7 +70,7 @@ public class Ship : MonoBehaviour
 
   // Collision Detection
   int currentCollisions = 0;
-  Vector2 lastSafePosition = new Vector2(0, 0);
+  Vector2 lastSafePosition;
   float lastSafeRotation;
 
   // Misc
@@ -78,6 +78,7 @@ public class Ship : MonoBehaviour
   bool _mouseOver = false;
   public bool mouseOver { get { return _mouseOver; } }
   Vector3 mouseToCenter;
+  public bool highlight { set { selectMarker.SetActive(value); } }
 
   ShipConfig.DialMove dialMove = new ShipConfig.DialMove()
   {
@@ -87,15 +88,12 @@ public class Ship : MonoBehaviour
   };
   ShipTypeConfigs.Values shipTypeConfig;
   string playerName;
-  // TODO do we need serialising?
   string uniqueID;
-  // TODO fix
   public bool ownShip = false;
 
   // cached references
   GameController controller;
   Menu menu;
-  ShipMenu shipMenu;
   ActionBar actionBar;
   PhotonView photonView;
 
@@ -103,9 +101,7 @@ public class Ship : MonoBehaviour
   {
     controller = FindObjectOfType<GameController>();
     menu = FindObjectOfType<Menu>();
-    shipMenu = FindObjectOfType<ShipMenu>();
     actionBar = FindObjectOfType<ActionBar>();
-
     photonView = gameObject.GetComponent<PhotonView>();
     playerName = photonView.Owner.NickName;
   }
@@ -131,7 +127,6 @@ public class Ship : MonoBehaviour
   }
 
   // MOVEMENT
-
   private void ExecuteMovement()
   {
     if (menu.isManualMode)
@@ -299,13 +294,12 @@ public class Ship : MonoBehaviour
 
   IEnumerator Forward(int moveVelocity, int endRotation = 0, bool reverse = false)
   {
-    lastSafePosition = transform.position;
-    lastSafeRotation = transform.eulerAngles.z;
     controller.LogMove(uniqueID, transform.position, endRotation, lastMoveStress);
     ResetMovementFlags();
     shipMoving = true;
 
     // TODO remove factor4
+    // But it does give extra accuracy in collisions..
     float distance = (0.1f / moveVelocity) * (shipTypeConfig.movement.forward[moveVelocity - 1] / 4);
 
     for (int i = 0; i < (40 * moveVelocity); i++)
@@ -315,8 +309,8 @@ public class Ship : MonoBehaviour
           ? -trans
           : trans;
 
-      yield return new WaitForEndOfFrame();
       CheckForSafety();
+      yield return new WaitForEndOfFrame();
     }
 
     transform.Rotate(0, 0, endRotation);
@@ -374,11 +368,12 @@ public class Ship : MonoBehaviour
       transform.Rotate(0, 0, angleIncrement * direction);
 
       // Shift the pivot along the y axis towards the other side
-      pivot -= reverse
-          ? (-shipTypeConfig.width) / 100f
-          : (shipTypeConfig.width) / 100f;
-      yield return new WaitForEndOfFrame();
+      float pivotAdjust = shipTypeConfig.width / 100;
+      if (reverse) pivotAdjust *= -1;
+      pivot -= pivotAdjust;
+
       CheckForSafety();
+      yield return new WaitForEndOfFrame();
     }
 
     transform.Rotate(0, 0, endRotation * direction);
@@ -547,56 +542,6 @@ public class Ship : MonoBehaviour
     }
   }
 
-  // Might not be used anymore?
-  public void ApplyEffect(int i)
-  {
-    switch (i)
-    {
-      case 0:
-        photonView.RPC("AdjustTokens", RpcTarget.AllBuffered, "disarmed", 0);
-        break;
-      case 1:
-        photonView.RPC("AdjustTokens", RpcTarget.AllBuffered, "critical", 0);
-        break;
-      case 2:
-        photonView.RPC("AdjustTokens", RpcTarget.AllBuffered, "ion", 0);
-        break;
-      case 3:
-        photonView.RPC("AdjustTokens", RpcTarget.AllBuffered, "jam", 0);
-        break;
-      case 4:
-        photonView.RPC("AdjustTokens", RpcTarget.AllBuffered, "tractor", 0);
-        break;
-      case 5:
-        Cloak();
-        break;
-
-      // TODO ? What the hell is this?
-      case 10:
-        BarrelRoll("left", "middle");
-        break;
-
-      case 16:
-        StartCoroutine(Forward(1));
-        break;
-      case 17:
-        StartCoroutine(Turn(45f, 0, 1));
-        break;
-      case 18:
-        StartCoroutine(Turn(45f, 0, -1));
-        break;
-      case 19:
-        DropBomb(shipMenu.GetBombDrop());
-        break;
-      case 20:
-        //Decloak();
-        break;
-      default:
-        Debug.Log("opened submenu");
-        break;
-    }
-  }
-
   public void ToggleTargetLock()
   {
     locked = !locked;
@@ -737,11 +682,6 @@ public class Ship : MonoBehaviour
       Bomb[] bombs = FindObjectsOfType<Bomb>();
       foreach (Bomb bomb in bombs) { bomb.Deselect(); }
     }
-  }
-
-  public void HighlightShip(bool state)
-  {
-    selectMarker.SetActive(state);
   }
 
   [PunRPC]
@@ -914,12 +854,7 @@ public class Ship : MonoBehaviour
   [PunRPC]
   private void MoveToSafety()
   {
-    // TODO Try lastSafePosition == null ?
-    Vector2 initialValue = new Vector2(0, 0);
-    if (lastSafePosition == initialValue || templateNumber == -1) return;
-
-    // TODO This has been left in with the matching one below incase it was actually doing something
-    // transform.Rotate(0, 0, -rotationPerformed);
+    if (templateNumber == -1) return;
 
     templateSpawn.transform.localPosition = new Vector3(0, -2 * shipSize);
     templateSpawn.transform.localEulerAngles = Vector3.zero;
@@ -980,9 +915,6 @@ public class Ship : MonoBehaviour
           break;
       }
     }
-
-    // TODO Smelly
-    // transform.Rotate(0, 0, rotationPerformed);
 
     if (lastSafePosition != new Vector2(transform.position.x, transform.position.y))
     {
@@ -1211,6 +1143,11 @@ public class Ship : MonoBehaviour
     bool barrelRoll = Input.GetKeyDown(KeyCode.B);
     bool toggleCoords = Input.GetKeyDown(KeyCode.Slash);
 
+    int ionThreshold = 1;
+    if (shipTypeConfig.width == 6) ionThreshold = 2;
+    if (shipTypeConfig.width == 8) ionThreshold = 3;
+    ShipConfig.DialMove cachedMove = dialMove;
+
     if (toggleCoords)
     {
       ToggleCoords();
@@ -1227,6 +1164,14 @@ public class Ship : MonoBehaviour
       {
         cancelExecuteMove = false;
         return;
+      }
+
+      if (tokens[7].count >= ionThreshold)
+      {
+        dialMove.difficulty = "blue";
+        dialMove.maneuver = ShipConfig.Maneuver.FORWARD;
+        dialMove.speed = 1;
+        photonView.RPC("AdjustTokens", RpcTarget.AllBuffered, "ion", -tokens[7].count);
       }
 
       if (menu.GetAutoStress())
@@ -1310,6 +1255,8 @@ public class Ship : MonoBehaviour
     {
       actionBar.ToggleBar("barrel");
     }
+
+    dialMove = cachedMove;
   }
 
   [PunRPC]

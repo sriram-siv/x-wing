@@ -1,19 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System;
 
-public class Dial : MonoBehaviour
+public class Dial : LinkParent
 {
   [SerializeField] GameObject title;
   [SerializeField] GameObject moves;
   [SerializeField] GameObject marker;
+  [SerializeField] GameObject highlight;
   [SerializeField] GameObject upgrades;
   [SerializeField] GameObject upgradeTitle;
   [SerializeField] GameObject ability;
   [SerializeField] GameObject abilityShipDisplay;
   [SerializeField] GameObject renameInput;
   [SerializeField] GameObject damage;
+  [SerializeField] GameObject moveButtons;
+  [SerializeField] GameObject damageCard;
 
   public Transform damageContainer { get { return damage.transform; } }
 
@@ -32,29 +36,27 @@ public class Dial : MonoBehaviour
   bool _ownShip = false;
   public bool ownShip { get { return _ownShip; } }
 
-  [SerializeField] GameObject attachedShip;
-  [SerializeField] ShipConfig.DialMove[] dialMoves;
-  [SerializeField] GameObject damageCard;
+  Ship attachedShip;
+  ShipConfig.DialMove[] dialMoves;
 
   void Start()
   {
-    if (ownShip)
-    {
-      try
-      {
-        attachedShip.GetComponent<Ship>().SetMoveFromDial(dialMoves[0]);
-      }
-      catch { Debug.Log("attached ship not found"); }
-    }
-  }
+    if (!ownShip) return;
 
+    if (attachedShip != null)
+      attachedShip.SetMoveFromDial(dialMoves[0]);
+    else
+      Debug.Log("Attached ship not found");
+  }
 
   void Update()
   {
-    if (ownShip && isSelected && dialActive)
-    {
-      MoveCursor();
-    }
+    if (ownShip && isSelected && dialActive) MoveCursor();
+  }
+
+  override public void AttachChildCollider(LinkedDialCollider child)
+  {
+    child.trigger.AddListener(SetMouseOver);
   }
 
   private void CascadeDials(float zIndex, Dial topDial)
@@ -62,7 +64,7 @@ public class Dial : MonoBehaviour
     Dial[] allDials = FindObjectsOfType<Dial>();
     foreach (Dial dial in allDials)
     {
-      if (dial != this) dial.Deselect();
+      dial.Deselect();
       if (dial.transform.position.z == zIndex && dial != topDial)
       {
         dial.transform.position += new Vector3(0, 0, 0.3f);
@@ -73,36 +75,36 @@ public class Dial : MonoBehaviour
 
   private void MoveCursor()
   {
-    bool hasUpdated = false;
-
     if (Input.GetKeyDown(KeyCode.LeftArrow))
     {
-      moveSelect.x = Mathf.Max(moveSelect.x - 1, 0);
-      hasUpdated = true;
+      SetMove(moveSelect.x - 1, moveSelect.y);
     }
     if (Input.GetKeyDown(KeyCode.RightArrow))
     {
-      moveSelect.x = Mathf.Min(moveSelect.x + 1, 6);
-      hasUpdated = true;
+      SetMove(moveSelect.x + 1, moveSelect.y);
     }
     if (Input.GetKeyDown(KeyCode.UpArrow))
     {
-      moveSelect.y = Mathf.Min(moveSelect.y + 1, 4);
-      hasUpdated = true;
+      SetMove(moveSelect.x, moveSelect.y + 1);
     }
     if (Input.GetKeyDown(KeyCode.DownArrow))
     {
-      moveSelect.y = Mathf.Max(moveSelect.y - 1, 0);
-      hasUpdated = true;
+      SetMove(moveSelect.x, moveSelect.y - 1);
     }
+  }
 
-    if (!hasUpdated) return;
-
+  public void SetMove(float x, float y)
+  {
+    moveSelect = new Vector2(
+      Mathf.Clamp(x, 0, 6),
+      Mathf.Clamp(y, 0, 4)
+    );
     float selectedMove = (moveSelect.y * 7) + moveSelect.x;
-    attachedShip.GetComponent<Ship>().SetMoveFromDial(dialMoves[(int)selectedMove]);
+    attachedShip.SetMoveFromDial(dialMoves[(int)selectedMove]);
     Vector3 markerOrigin = new Vector3(-4.1f, -6.32f, -0.1f);
     Vector3 markerMoveVector = new Vector3(1.65f * moveSelect.x, 2.05f * moveSelect.y);
     marker.transform.localPosition = markerOrigin + markerMoveVector;
+    highlight.SetActive(true);
   }
 
   private void OnMouseDown()
@@ -110,9 +112,10 @@ public class Dial : MonoBehaviour
     Select();
   }
 
+  // TODO use getter
   public Ship GetAttachedShip()
   {
-    return attachedShip.GetComponent<Ship>();
+    return attachedShip;
   }
 
   public void Select()
@@ -132,6 +135,7 @@ public class Dial : MonoBehaviour
     dialActive = true;
     upgrades.SetActive(true);
     damage.SetActive(true);
+    highlight.SetActive(true);
 
     AnchorUpgradesDisplay();
     UpgradeCard[] upgradeCards = FindObjectsOfType<UpgradeCard>();
@@ -141,7 +145,7 @@ public class Dial : MonoBehaviour
       ability.SetActive(false);
     }
 
-    GetAttachedShip().HighlightShip(true);
+    attachedShip.highlight = true;
   }
 
   public void Deselect()
@@ -149,15 +153,8 @@ public class Dial : MonoBehaviour
     _isSelected = false;
     upgrades.SetActive(false);
     damage.SetActive(false);
-    Debug.Log("Deselect: " + name);
-    // TODO still cant click off and unhighlight a ship??
-    attachedShip.GetComponent<Ship>().HighlightShip(false);
-  }
-
-  public void SetDialActive(bool state)
-  {
-    dialActive = state;
-    attachedShip.GetComponent<Ship>().HighlightShip(_isSelected);
+    attachedShip.highlight = false;
+    highlight.SetActive(false);
   }
 
   public void AnchorUpgradesDisplay()
@@ -185,21 +182,25 @@ public class Dial : MonoBehaviour
   private void OnMouseEnter()
   {
     _mouseOver = true;
-    attachedShip.GetComponent<Ship>().HighlightShip(true);
+    attachedShip.highlight = true;
   }
 
   private void OnMouseExit()
   {
-    Debug.Log("exiting collider: " + name);
-    Debug.Log("active: " + dialActive);
     _mouseOver = false;
-    attachedShip.GetComponent<Ship>().HighlightShip(_isSelected);
+    attachedShip.highlight = isSelected;
   }
 
   public void SetMouseOver(bool state)
   {
     _mouseOver = state;
-    attachedShip.GetComponent<Ship>().HighlightShip(state);
+    attachedShip.highlight = state;
+  }
+
+  public void SetDialActive(bool state)
+  {
+    dialActive = state;
+    attachedShip.highlight = isSelected;
   }
 
   private void Destroy()
@@ -220,50 +221,45 @@ public class Dial : MonoBehaviour
   {
     title.GetComponent<TMP_Text>().text = pilot.name;
     upgradeTitle.GetComponent<TMP_Text>().text = pilot.name;
-
     ability.GetComponent<TMP_Text>().text = pilot.ability;
     abilityShipDisplay.GetComponent<TMP_Text>().text = pilot.config.ability;
-
     dialMoves = pilot.config.moves;
-
     name = pilot.name + "_dial";
 
-    foreach (Ship ship in FindObjectsOfType<Ship>())
-    {
-      if (ship.GetUniqueID() == pilot.uniqueID)
-      {
-        attachedShip = ship.gameObject;
-      }
-    }
+    attachedShip = Array.Find(
+      FindObjectsOfType<Ship>(),
+      s => s.GetUniqueID() == pilot.uniqueID
+    );
 
     if (player == 1) _ownShip = true;
 
     GetComponent<SpriteRenderer>().sprite = pilot.config.dial[0];
     moves.GetComponent<SpriteRenderer>().sprite = pilot.config.dial[1];
 
-    foreach (string[] type in pilot.upgrades.GetAll())
+    foreach (string[] type in pilot.upgrades.all)
     {
-      if (type != null)
+      foreach (string card in type)
       {
-        foreach (string card in type)
+        Sprite cardImg = Resources.Load<Sprite>("Upgrades/" + card);
+
+        if (cardImg == null)
         {
-          Sprite cardImg = Resources.Load<Sprite>("Upgrades/" + card);
+          Debug.Log("Upgrade card not available - " + card);
+          continue;
+        }
 
-          if (cardImg == null) { continue; }
+        int[] upgradeInfo = FindObjectOfType<Loader>().GetUpgradeInfo(card);
 
-          int[] upgradeInfo = FindObjectOfType<Loader>().GetUpgradeInfo(card);
+        upgrades.transform.GetChild(totalUpgrades).GetComponent<UpgradeCard>().Initialize(cardImg, upgradeInfo);
+        totalUpgrades++;
 
-          upgrades.transform.GetChild(totalUpgrades).GetComponent<UpgradeCard>().Initialize(cardImg, upgradeInfo);
-          totalUpgrades++;
-
-          if (card == "hullupgrade")
-          {
-            attachedShip.GetComponent<Stats>().SetHull(1);
-          }
-          if (card == "shieldupgrade")
-          {
-            attachedShip.GetComponent<Stats>().SetShield(1);
-          }
+        if (card == "hullupgrade")
+        {
+          attachedShip.GetComponent<Stats>().SetHull(1);
+        }
+        if (card == "shieldupgrade")
+        {
+          attachedShip.GetComponent<Stats>().SetShield(1);
         }
       }
     }
@@ -273,6 +269,7 @@ public class Dial : MonoBehaviour
   {
     foreach (Loader.UsedUpgrade updatedUpgrade in updatedUpgrades)
     {
+      // TODO save an Array of upgrade transforms on init so we can use find here
       for (int i = 0; i < upgrades.transform.childCount; i++)
       {
         GameObject upgrade = upgrades.transform.GetChild(i).gameObject;

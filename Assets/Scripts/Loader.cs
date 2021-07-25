@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -114,27 +115,24 @@ public class Loader : MonoBehaviour
       }
 
       // Initialise UsedUpgrades variable
-      string[][] upgrades = pilot.upgrades.GetAll();
+      string[][] upgrades = pilot.upgrades.all;
       foreach (string[] type in upgrades)
       {
-        if (type != null)
+        foreach (string upgrade in type)
         {
-          foreach (string upgrade in type)
+          int[] upgradeInfo = GetUpgradeInfo(upgrade);
+
+          // Create new UsedUpgrade
+          UsedUpgrade newUsedUpgrade = new UsedUpgrade()
           {
-            int[] upgradeInfo = GetUpgradeInfo(upgrade);
+            name = upgrade,
+            remainingCharges = upgradeInfo[1],
+            remainingForce = upgradeInfo[2],
+            currentSide = 0,
+          };
 
-            // Create new UsedUpgrade
-            UsedUpgrade newUsedUpgrade = new UsedUpgrade()
-            {
-              name = upgrade,
-              remainingCharges = upgradeInfo[1],
-              remainingForce = upgradeInfo[2],
-              currentSide = 0,
-            };
-
-            // Add to XWS file
-            pilot.upgrades.usedUpgrades.Add(newUsedUpgrade);
-          }
+          // Add to XWS file
+          pilot.upgrades.usedUpgrades.Add(newUsedUpgrade);
         }
       }
 
@@ -336,11 +334,14 @@ public class Loader : MonoBehaviour
 
     public List<UsedUpgrade> usedUpgrades = new List<UsedUpgrade>();
 
-    public string[][] GetAll()
+    public string[][] all
     {
-      string[][] all = { astromech, cannon, configuration, crew, device, forcepower,
+      get
+      {
+        string[][] all = { astromech, cannon, configuration, crew, device, forcepower,
                 gunner, illicit, missile, modification, sensor , talent, tech, title , torpedo, turret};
-      return all;
+        return all.Where(type => type != null).ToArray();
+      }
     }
   }
 

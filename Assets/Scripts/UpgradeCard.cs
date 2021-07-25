@@ -69,31 +69,19 @@ public class UpgradeCard : MonoBehaviour
         GetComponentInChildren<MeshRenderer>().sortingOrder += 5;
       }
     }
-
-    // Deactive dial so that up and down arrows can adjust the charge value
-    if (chargeMax > 0 || forceMax > 0)
-    {
-      attachedDial.GetComponent<Dial>().SetDialActive(false);
-    }
-
-    // Keep dial active, useful for drawing damage and other things
-    attachedDial.GetComponent<Dial>().SetMouseOver(true);
     selected = true;
   }
 
   private void OnMouseExit()
   {
     ResetCardPosition();
-
-    attachedDial.GetComponent<Dial>().SetDialActive(true);
-
-    attachedDial.GetComponent<Dial>().SetMouseOver(true);
-
     selected = false;
   }
 
   public void ResetCardPosition()
   {
+    if (GetComponent<BoxCollider2D>() == null) return;
+
     transform.localScale = new Vector3(0.7f, 0.7f);
     transform.localPosition = new Vector3(transform.localPosition.x, 3.3f);
 
@@ -118,6 +106,9 @@ public class UpgradeCard : MonoBehaviour
 
   public void Initialize(Sprite card, int[] upgradeInfo)
   {
+    gameObject.AddComponent<BoxCollider2D>();
+    ResetCardPosition();
+
     GetComponent<SpriteRenderer>().sprite = card;
 
     name = card.name;
@@ -152,6 +143,12 @@ public class UpgradeCard : MonoBehaviour
         force.transform.GetChild(0).gameObject.SetActive(true);
         force.transform.GetChild(0).GetComponentInChildren<TMP_Text>().text = forceAmount.ToString();
       }
+    }
+
+    if (forceAmount > 0 || chargeAmount > 0)
+    {
+      LinkedDialCollider linkedCollider = GetComponent<LinkedDialCollider>();
+      linkedCollider.trigger.AddListener(active => attachedDial.GetComponent<Dial>().SetDialActive(!active));
     }
   }
 

@@ -272,8 +272,9 @@ public class Menu : MonoBehaviour
     if (rangeModeOn) { RangeToggle(); }
 
     bool startingState = hand.activeSelf;
-
+    // Reset menu state
     ExitMenu();
+    if (visibleDials == 1) { SwitchHand(); }
 
     if (startingState == false)
     {
@@ -281,16 +282,14 @@ public class Menu : MonoBehaviour
       hand.SetActive(true);
       squadMenu.SetActive(true);
       squadButton.transform.GetChild(0).GetComponent<Image>().color = Color.green;
+    }
 
-      if (visibleDials == 1) { SwitchHand(); }
+    foreach (Dial dial in FindObjectsOfType<Dial>())
+    {
+      dial.Deselect();
 
-      Dial[] dials = FindObjectsOfType<Dial>();
-      foreach (Dial dial in dials)
-      {
-        dial.Deselect();
+      if (startingState == false)
         dial.GetAttachedShip().ToggleMoveIndicator(true);
-      }
-
     }
   }
 
@@ -328,7 +327,7 @@ public class Menu : MonoBehaviour
     {
       ship.DeselectShip();
       ship.ToggleMoveIndicator(false);
-      ship.HighlightShip(false);
+      ship.highlight = false;
     }
 
     FindObjectOfType<ActionBar>().ToggleBar("hidden");
@@ -500,7 +499,7 @@ public class Menu : MonoBehaviour
     Dial[] dials = FindObjectsOfType<Dial>();
     foreach (Dial dial in dials)
     {
-      if (!dial.isSelected)
+      if (!dial.mouseOver)
       {
         dial.Deselect();
       }
