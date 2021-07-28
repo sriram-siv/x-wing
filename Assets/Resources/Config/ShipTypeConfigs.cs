@@ -8,6 +8,7 @@ public struct ShipTypeConfigs
   [System.Serializable]
   public struct Values
   {
+    public string size;
     public float width;
 
     [System.Serializable]

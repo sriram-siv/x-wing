@@ -26,6 +26,7 @@ public class GameController : MonoBehaviour
   // state variables
 
   List<MoveLog> moveLog = new List<MoveLog>();
+  int moveLogCurrentIndex = 0;
 
   bool[] damageTaken = new bool[33];
 
@@ -75,8 +76,9 @@ public class GameController : MonoBehaviour
         debrisSpawn.transform.position += new Vector3(0, -7);
       }
 
-      GameObject relayDevice = PhotonNetwork.InstantiateSceneObject("RelayDevice",
-          transform.position, transform.rotation, 0);
+      GameObject relayDevice = PhotonNetwork.InstantiateSceneObject(
+        "RelayDevice", transform.position, transform.rotation
+      );
 
       relayDevice.GetPhotonView().RPC("SetPlaymat", RpcTarget.AllBuffered, FindObjectOfType<Loader>().GetPlaymat());
       relayDevice.GetPhotonView().RPC(
@@ -135,43 +137,43 @@ public class GameController : MonoBehaviour
       refreshList = false;
       StartCoroutine(UpdatePlayerList());
     }
+
+    // TODO Reconnect
+    // if (!PhotonNetwork.IsConnected) PhotonNetwork.ReconnectAndRejoin()
   }
 
   // MOVEMENT
-  // !TODO Important Why doesnt this just log the actual last rotation, rather than the change?
-  public void LogMove(string shipID, Vector2 position, float rotation, int stress)
+  public void LogMove(string shipID, Vector2 position, float angle, int stress = 0)
   {
-    moveLog.Add(new MoveLog { ship = shipID, move = position, angle = rotation, stress = stress });
+    moveLog.Add(new MoveLog { ship = shipID, move = position, angle = angle, stress = stress });
   }
 
   private void UndoMove()
   {
+    if (moveLog.Count == 0) return;
+
     if (Input.GetKeyDown(KeyCode.Z) && Input.GetKey(KeyCode.LeftControl))
     {
-      if (moveLog.Count != 0)
-      {
-        foreach (Ship ship in FindObjectsOfType<Ship>())
-        {
-          if (ship.GetUniqueID() == moveLog.Last().ship)
-          {
-            ship.gameObject.transform.position = moveLog.Last().move;
-            ship.gameObject.transform.Rotate(0, 0, -moveLog.Last().angle);
+      MoveLog previousState = moveLog.Last();
+      Ship ship = Array.Find(FindObjectsOfType<Ship>(), s => s.GetUniqueID() == previousState.ship);
 
-            ship.gameObject.GetPhotonView().RPC(
-                "AdjustTokens",
-                RpcTarget.AllBuffered,
-                "stress",
-                -moveLog.Last().stress
-            );
+      ship.gameObject.transform.position = previousState.move;
+      ship.gameObject.transform.eulerAngles = new Vector3(
+        ship.transform.eulerAngles.x,
+        ship.transform.eulerAngles.y,
+        previousState.angle
+      );
 
-            ship.gameObject.GetPhotonView().RPC("ResetMovementFlags", RpcTarget.AllBuffered);
+      ship.gameObject.GetPhotonView().RPC(
+          "AdjustTokens",
+          RpcTarget.AllBuffered,
+          "stress",
+          -previousState.stress
+      );
 
-            moveLog.RemoveAt(moveLog.Count() - 1);
+      ship.gameObject.GetPhotonView().RPC("ResetMovementFlags", RpcTarget.AllBuffered);
 
-            break;
-          }
-        }
-      }
+      moveLog.RemoveAt(moveLog.Count() - 1);
     }
   }
 
@@ -248,6 +250,7 @@ public class GameController : MonoBehaviour
           }
         }
 
+        // TODO use new Linked Collider classes
         // Determine whether a dropdown menu is in use before hiding the action bar
         bool dropdownActive;
         try

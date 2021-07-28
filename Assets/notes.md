@@ -10,3 +10,5 @@ This should also log hazards and bombs
 Each move should get a unique id - a simple incrementing int should do
 
 Drop template should look at the ships own movement flags
+
+Should log at end of move, not beginning - so that the last move is captured

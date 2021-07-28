@@ -3039,7 +3039,6 @@ MonoBehaviour:
   deathVFX: {fileID: 159918, guid: a0040bf7072bc2f4e82d887d50a9c5e2, type: 3}
   relay: {fileID: 0}
   ownShip: 0
-  shipMenu: {fileID: 0}
 --- !u!114 &1861575633973918592
 MonoBehaviour:
   m_ObjectHideFlags: 0

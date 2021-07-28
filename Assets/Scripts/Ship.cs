@@ -42,10 +42,7 @@ public class Ship : MonoBehaviour
   Sprite[] arcsInterior = new Sprite[4];
   List<GameObject> tokenStack = new List<GameObject>();
 
-
-  // TODO remove this variable eventually
-  float shipSize;
-  // TODO this should look at the global value
+  // For executing moves manually
   int velocity = 1;
 
   // Ship Status
@@ -111,7 +108,7 @@ public class Ship : MonoBehaviour
     RotateTokens();
     UpdateCoords();
 
-    if (shipActive && !shipMoving && targetInput.activeSelf == false && relay != null)
+    if (shipActive && !shipMoving && !targetInput.activeSelf && relay != null)
     {
       Controls();
       ExecuteMovement();
@@ -166,12 +163,13 @@ public class Ship : MonoBehaviour
 
   private void KTurn()
   {
+    controller.LogMove(uniqueID, transform.position, transform.eulerAngles.z);
+
     int angle = 180;
     // Turn the ship 90deg if the shift key is pressed
     if (Input.GetKey(KeyCode.LeftShift)) { angle = 90; }
     if (Input.GetKey(KeyCode.RightShift)) { angle = -90; }
 
-    controller.LogMove(uniqueID, transform.position, angle, 0);
     ResetMovementFlags();
     transform.Rotate(0, 0, angle);
   }
@@ -186,7 +184,7 @@ public class Ship : MonoBehaviour
 
   public void BarrelRoll(string direction, string position)
   {
-    controller.LogMove(uniqueID, transform.position, 0, 0);
+    controller.LogMove(uniqueID, transform.position, transform.eulerAngles.z);
     ResetMovementFlags();
 
     float lateralMovement = -shipTypeConfig.barrel[0];
@@ -228,19 +226,16 @@ public class Ship : MonoBehaviour
 
     // TODO prevent this in ActionBar
     // ensure bank template isn't used for any calculations beyond small ships
-    if (shipSize != 1) { curve = 0; }
+    if (shipTypeConfig.size != "small") { curve = 0; }
 
     float angle = 0;
     if (curve == 1) angle = 45;
     if (curve == 2) angle = -45;
 
-    controller.LogMove(uniqueID, transform.position, angle, 0);
-    ResetMovementFlags();
-
     // Decloak forward
     if (direction == 0)
     {
-      int speed = shipSize == 1 ? 2 : 1;
+      int speed = shipTypeConfig.size == "small" ? 2 : 1;
       switch (curve)
       {
         case 0:
@@ -258,6 +253,9 @@ public class Ship : MonoBehaviour
     }
     else
     {
+      controller.LogMove(uniqueID, transform.position, transform.eulerAngles.z);
+      ResetMovementFlags();
+
       Vector3 vector = shipTypeConfig.cloak[curve];
       if (direction == 2) vector = -vector;
 
@@ -270,9 +268,11 @@ public class Ship : MonoBehaviour
       if (position == 2) adjust = -shipTypeConfig.barrel[1];
       transform.Translate(new Vector3(0, adjust));
 
+      CheckForSafety();
+
       // Flags
       templateNumber = 0;
-      if (shipSize == 1) templateNumber = 1;
+      if (shipTypeConfig.size == "small") templateNumber = 1;
       if (curve > 0) templateNumber = 6;
       if (curve == 2) flipTemplate = true;
       barrelDirection = direction;
@@ -280,7 +280,6 @@ public class Ship : MonoBehaviour
       if (direction > 0) barrelEndPos = position;
     }
 
-    CheckForSafety();
     photonView.RPC("ApplyCloakEffect", RpcTarget.AllBuffered, false);
   }
 
@@ -294,7 +293,7 @@ public class Ship : MonoBehaviour
 
   IEnumerator Forward(int moveVelocity, int endRotation = 0, bool reverse = false)
   {
-    controller.LogMove(uniqueID, transform.position, endRotation, lastMoveStress);
+    controller.LogMove(uniqueID, transform.position, transform.eulerAngles.z, lastMoveStress);
     ResetMovementFlags();
     shipMoving = true;
 
@@ -330,7 +329,7 @@ public class Ship : MonoBehaviour
   // Speed parameter is input as 1 less than move speed
   IEnumerator Turn(float angle, int speed, int direction, int endRotation = 0, bool reverse = false)
   {
-    controller.LogMove(uniqueID, transform.position, (angle + endRotation) * direction, lastMoveStress);
+    controller.LogMove(uniqueID, transform.position, transform.eulerAngles.z, lastMoveStress);
     ResetMovementFlags();
     shipMoving = true;
 
@@ -339,9 +338,8 @@ public class Ship : MonoBehaviour
     float radius = shipTypeConfig.movement.bank[Mathf.Clamp(speed, 0, 2)];
     if (angle == 90) radius = shipTypeConfig.movement.turn[Mathf.Clamp(speed, 0, 2)];
     float angleIncrement = angle / 100f;
-    float pivot = reverse
-        ? -2 * shipSize
-        : 2 * shipSize;
+    float pivot = shipTypeConfig.width / 2;
+    if (reverse) pivot *= -1;
 
     for (int i = 0; i < 100; i++)
     {
@@ -353,7 +351,6 @@ public class Ship : MonoBehaviour
       Vector3 pivIn = controller.TransformVectorByAngle(pivotMagnitude, pivotAngle + angleIncrement + transform.eulerAngles.z);
       Vector3 pivOut = controller.TransformVectorByAngle(pivotMagnitude, pivotAngle + transform.eulerAngles.z);
       transform.position += (pivOut - pivIn) * direction;
-
 
       // Movement along the arc (in steps of angleIncrement)
       // Length of chord and translation vector
@@ -591,7 +588,7 @@ public class Ship : MonoBehaviour
 
     var newBomb = PhotonNetwork.Instantiate("Bomb", transform.position, transform.rotation, 0);
 
-    float shipHalfLength = shipSize * 2;
+    float shipHalfLength = shipTypeConfig.width / 2;
     float dropDistance = shipHalfLength + 5.42f;
 
     // TODO use normal movement on bomb
@@ -689,7 +686,7 @@ public class Ship : MonoBehaviour
   {
     var explosion = Instantiate(deathVFX, transform.position, Quaternion.identity);
     Destroy(explosion, 1f);
-    controller.LogMove(uniqueID, transform.position, 0f, 0);
+    controller.LogMove(uniqueID, transform.position, transform.eulerAngles.z);
     transform.position = new Vector3(0, -20, 0);
   }
 
@@ -856,16 +853,18 @@ public class Ship : MonoBehaviour
   {
     if (templateNumber == -1) return;
 
-    templateSpawn.transform.localPosition = new Vector3(0, -2 * shipSize);
+    templateSpawn.transform.localPosition = new Vector3(0, -0.5f) * shipTypeConfig.width;
     templateSpawn.transform.localEulerAngles = Vector3.zero;
 
     switch (barrelDirection)
     {
       case 1:
-        templateSpawn.transform.localPosition = new Vector3(2 * shipSize, 0);
+        templateSpawn.transform.localPosition =
+          new Vector3(0.5f, 0) * shipTypeConfig.width;
         break;
       case 2:
-        templateSpawn.transform.localPosition = new Vector3(-2 * shipSize, 0);
+        templateSpawn.transform.localPosition =
+          new Vector3(-0.5f, 0) * shipTypeConfig.width;
         break;
       default:
         break;
@@ -883,7 +882,8 @@ public class Ship : MonoBehaviour
       default:
         break;
     }
-    if (shipSize != 1 && barrelDirection != -1)
+    // TODO refactor this to be more clear that it links to above blocks
+    if (shipTypeConfig.size != "small" && barrelDirection != -1)
     {
       float lateralAdjust = barrelDirection == 1
           ? 1
@@ -893,7 +893,7 @@ public class Ship : MonoBehaviour
 
     if (dropTemplateFromFront)
     {
-      templateSpawn.transform.localPosition = new Vector3(0, 2 * shipSize);
+      templateSpawn.transform.localPosition = new Vector3(0, 0.5f) * shipTypeConfig.width;
       templateSpawn.transform.localEulerAngles = Vector3.forward * 180;
     }
 
@@ -901,7 +901,7 @@ public class Ship : MonoBehaviour
         templateSpawn.transform.position, templateSpawn.transform.rotation, 0);
     dropTemplate.GetPhotonView().RPC("InitTemplate", RpcTarget.AllBuffered, templateNumber, flipTemplate);
 
-    if (shipSize == 1)
+    if (shipTypeConfig.size == "small")
     {
       switch (barrelDirection)
       {
@@ -918,10 +918,10 @@ public class Ship : MonoBehaviour
 
     if (lastSafePosition != new Vector2(transform.position.x, transform.position.y))
     {
-      float rotation = lastSafeRotation - transform.eulerAngles.z;
-      controller.LogMove(uniqueID, transform.position, rotation, 0);
+      controller.LogMove(uniqueID, transform.position, transform.eulerAngles.z, 0);
       ResetMovementFlags();
 
+      float rotation = lastSafeRotation - transform.eulerAngles.z;
       transform.position = lastSafePosition;
       transform.eulerAngles = new Vector3(
         transform.eulerAngles.x,
@@ -981,7 +981,6 @@ public class Ship : MonoBehaviour
     gameObject.name = pilot.name;
     nameLabel.GetComponent<TMP_Text>().text = pilot.name;
     uniqueID = pilot.uniqueID;
-    shipSize = pilot.config.sizeNum;
 
     // Set stats from config file
     Stats stats = GetComponent<Stats>();
@@ -1023,7 +1022,7 @@ public class Ship : MonoBehaviour
     {
       firingArc.transform.GetChild(1).gameObject.SetActive(true);
       firingArcInternal.transform.GetChild(1).gameObject.SetActive(true);
-      firingArc.transform.GetChild(1).transform.localPosition += new Vector3(0, -2, 0) * shipSize;
+      firingArc.transform.GetChild(1).transform.localPosition += new Vector3(0, -0.5f) * shipTypeConfig.width;
     }
 
     // TODO move this up to top of block
@@ -1032,7 +1031,7 @@ public class Ship : MonoBehaviour
     )[size];
 
     // Configure ship size variables
-    selectMarker.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("UI/ship-marker-" + shipSize);
+    selectMarker.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("UI/ship-marker-" + shipTypeConfig.size);
     firingArc.transform.GetChild(0).localPosition = shipTypeConfig.objects.arc;
     templateSpawn.transform.localPosition = shipTypeConfig.objects.template;
     statsLabel.transform.localPosition = shipTypeConfig.objects.stats;

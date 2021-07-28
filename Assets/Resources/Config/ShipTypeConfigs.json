@@ -1,5 +1,6 @@
 {
   "small": {
+    "size": "small",
     "width": 4,
     "movement": {
       "forward": [8, 12, 16, 20, 24],
@@ -26,6 +27,7 @@
     }
   },
   "medium": {
+    "size": "medium",
     "width": 6,
     "movement": {
       "forward": [10, 14, 18, 22, 26],
@@ -52,6 +54,7 @@
     }
   },
   "large": {
+    "size": "large",
     "width": 8,
     "movement": {
       "forward": [12, 16, 20, 24, 28],
